@@ -9,8 +9,8 @@
 	</PropertyGroup>
 
 	<PropertyGroup Label="NuGet">
-		<PackageId>Strike</PackageId>
-		<Title>Strike</Title>
+		<PackageId>Strike.Client</PackageId>
+		<Title>Strike.Client</Title>
 		<Description>A client API for strike.me bitcoin and lightning service.</Description>
 
 		<Authors>marfusios; Mariusz Kotas</Authors>
