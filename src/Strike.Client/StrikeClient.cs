@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Diagnostics;
-using Strike.Client.Converters;
+﻿using Strike.Client.Converters;
 
 namespace Strike.Client;
 
@@ -104,7 +103,8 @@ public sealed partial class StrikeClient
 
 	private ResponseParser PostAsync<TRequest>(string path, TRequest request) where TRequest : RequestBase
 	{
-		Guard.IsNotNull(request);
+		if (request == null)
+			throw new ArgumentNullException(nameof(request));
 
 		var client = _clientFactory.CreateClient(HttpClientName);
 		var url = new Uri(_baseUrl, path);

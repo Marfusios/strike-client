@@ -1,6 +1,4 @@
-﻿using CommunityToolkit.Diagnostics;
-
-namespace Strike.Client.Converters;
+﻿namespace Strike.Client.Converters;
 
 /// <summary>
 /// Strike-specific extension methods for <see cref="JsonSerializerOptions"/>
@@ -14,8 +12,6 @@ public static class StrikeExtensions
 	/// <returns>The object passed in, with the Strike converters added</returns>
 	public static JsonSerializerOptions AddStrikeConverters(this JsonSerializerOptions options)
 	{
-		Guard.IsNotNull(options);
-
 		options.Converters.Add(new DateOnlyConverter());
 		options.Converters.Add(new DateTimeOffsetConverter());
 		options.Converters.Add(new DecimalConverter());
