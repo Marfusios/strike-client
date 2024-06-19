@@ -34,9 +34,8 @@ public sealed partial class StrikeClient
 	/// <param name="logger">A logging instance. Log entries will be provided at Information level at completion of each api call; and at Trace level with request and content details at the start and end of each api call. If not provided, a <see cref="NullLogger" /> instance will be used.</param>
 	/// <remarks>
 	/// Usage patterns: 
-	/// A single <see cref="StrikeClient"/> may be used for all API calls, or a separate one may be used for each <see cref="Item"/>. 
-	/// If the <paramref name="accessToken"/> is provided, it will be used on every call unless overridden.
-	/// However, if not provided here, it may be provided directly for each API call.
+	/// A single <see cref="StrikeClient"/> may be used for all API calls, or a separate one may be used for each
+	/// If the <paramref name="accessToken"/> is provided, it will be used on every call
 	/// </remarks>
 	public StrikeClient(
 		Environment environment,
