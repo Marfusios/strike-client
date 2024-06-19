@@ -1,5 +1,5 @@
 ![Logo](https://raw.githubusercontent.com/Marfusios/strike-client/master/strike_wide.png)
-# Strike .NET client [![NuGet version](https://badge.fury.io/nu/Strike.Client.svg)](https://www.nuget.org/packages/Strike.Client) [![Nuget downloads](https://img.shields.io/nuget/dt/Strike.Client)](https://www.nuget.org/packages/Strike.Client)
+# Strike .NET client [![NuGet version](https://badge.fury.io/nu/StrikeWallet.Client.svg)](https://www.nuget.org/packages/StrikeWallet.Client) [![Nuget downloads](https://img.shields.io/nuget/dt/StrikeWallet.Client)](https://www.nuget.org/packages/StrikeWallet.Client)
 
 This is a C# implementation of the Strike API found here:
 
@@ -12,7 +12,7 @@ https://docs.strike.me/api
 
 ### Features
 
-* installation via NuGet ([Strike.Client](https://www.nuget.org/packages/Strike.Client))
+* installation via NuGet ([StrikeWallet.Client](https://www.nuget.org/packages/StrikeWallet.Client))
 * targeting .NET Standard 2.0 (.NET Core, Linux/MacOS compatible) + Standard 2.1, .NET 5-8
 
 ### Usage
