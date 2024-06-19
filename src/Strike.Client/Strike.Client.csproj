@@ -1,0 +1,65 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>Strike.Client</AssemblyName>
+		<RootNamespace>Strike.Client</RootNamespace>
+
+		<TargetFrameworks>netstandard2.0;netcoreapp3.1;net6.0;net7.0;net8.0</TargetFrameworks>
+		<CheckEolTargetFramework>false</CheckEolTargetFramework>
+	</PropertyGroup>
+
+	<PropertyGroup Label="NuGet">
+		<Title>Strike.Client</Title>
+		<Description>A client API for strike.me bitcoin and lightning service.</Description>
+
+		<Authors>marfusios; Mariusz Kotas</Authors>
+		<PackageTags>bitcoin lightning payments api</PackageTags>
+		<Copyright>Copyright 2024 Mariusz Kotas</Copyright>
+
+		<PackageIcon>strike_white.png</PackageIcon>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReadmeFile>readme.md</PackageReadmeFile>
+
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<RepositoryUrl>https://github.com/marfusios/strike-client</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Copyright>
+			Copyright © 2024 Mariusz Kotas
+		</Copyright>
+		<Copyright>$([System.Text.RegularExpressions.Regex]::Replace($(Copyright), `\s+`, ` `).Trim())</Copyright>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="strike_white.png" Pack="true" PackagePath="" />
+		<None Include="..\..\readme.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Diagnostics" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+		<PackageReference Include="Microsoft.Extensions.Http" />
+		<PackageReference Include="Microsoft.Extensions.Logging" />
+		<PackageReference Include="System.Net.Http.Json" />
+		<PackageReference Include="System.Text.Json" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.PerformanceSensitiveAnalyzers" PrivateAssets="All" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
+		<PackageReference Include="MinVer" PrivateAssets="All" />
+	</ItemGroup>
+
+	<PropertyGroup Label="MinVer">
+		<MinVerAutoIncrement>minor</MinVerAutoIncrement>
+		<MinVerDefaultPreReleaseIdentifiers>preview.0</MinVerDefaultPreReleaseIdentifiers>
+		<MinVerTagPrefix>v</MinVerTagPrefix>
+	</PropertyGroup>
+
+</Project>

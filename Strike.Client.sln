@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{360B18BD-653A-4824-9261-C88167EEBAD2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{0544BC01-B569-4729-86B0-5AFDBF7EED46}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test_integration", "test_integration", "{42E4078C-4FBE-4B03-B889-1573332945A9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B771F515-0677-409B-BEC1-B84BC88E7392}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+		.github\workflows\dotnet-core-branches.yml = .github\workflows\dotnet-core-branches.yml
+		.github\workflows\dotnet-core.yml = .github\workflows\dotnet-core.yml
+		LICENSE = LICENSE
+		README.md = README.md
+		strike_wide.png = strike_wide.png
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Strike.Client", "src\Strike.Client\Strike.Client.csproj", "{7C839374-F291-4997-8CB6-2D9DBF303163}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Strike.Client.Sample", "test_integration\Strike.Client.Sample\Strike.Client.Sample.csproj", "{226413C3-688B-4378-8B15-8D197ED1DC63}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Strike.Client.Tests", "test\Strike.Client.Tests\Strike.Client.Tests.csproj", "{B03E2550-9E90-43A8-B8AC-7FD5121DA7B3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7C839374-F291-4997-8CB6-2D9DBF303163}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C839374-F291-4997-8CB6-2D9DBF303163}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C839374-F291-4997-8CB6-2D9DBF303163}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C839374-F291-4997-8CB6-2D9DBF303163}.Release|Any CPU.Build.0 = Release|Any CPU
+		{226413C3-688B-4378-8B15-8D197ED1DC63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{226413C3-688B-4378-8B15-8D197ED1DC63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{226413C3-688B-4378-8B15-8D197ED1DC63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{226413C3-688B-4378-8B15-8D197ED1DC63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B03E2550-9E90-43A8-B8AC-7FD5121DA7B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B03E2550-9E90-43A8-B8AC-7FD5121DA7B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B03E2550-9E90-43A8-B8AC-7FD5121DA7B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B03E2550-9E90-43A8-B8AC-7FD5121DA7B3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7C839374-F291-4997-8CB6-2D9DBF303163} = {360B18BD-653A-4824-9261-C88167EEBAD2}
+		{226413C3-688B-4378-8B15-8D197ED1DC63} = {42E4078C-4FBE-4B03-B889-1573332945A9}
+		{B03E2550-9E90-43A8-B8AC-7FD5121DA7B3} = {0544BC01-B569-4729-86B0-5AFDBF7EED46}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EE3E0B94-CF20-4C22-B50B-E720E8DFD675}
+	EndGlobalSection
+EndGlobal
