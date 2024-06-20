@@ -1,39 +1,39 @@
-﻿namespace Strike.Client.Models;
+﻿namespace Strike.Client.Invoices;
 
 /// <summary>
 /// All supported currencies
 /// </summary>
-public enum Currency
+public enum InvoiceState
 {
 	/// <summary>
-	/// 
+	/// Invoice is ready to be paid
 	/// </summary>
-	[EnumMember(Value = "BTC")]
-	Btc,
+	[EnumMember(Value = "UNPAID")]
+	Unpaid,
 
 	/// <summary>
-	/// 
+	/// Invoice is in process of being paid
 	/// </summary>
-	[EnumMember(Value = "USD")]
-	Usd,
+	[EnumMember(Value = "PENDING")]
+	Pending,
 
 	/// <summary>
-	/// 
+	/// Invoice is paid
 	/// </summary>
-	[EnumMember(Value = "EUR")]
-	Eur,
+	[EnumMember(Value = "PAID")]
+	Paid,
 
 	/// <summary>
-	/// 
+	/// Invoice is explicitly cancelled
 	/// </summary>
-	[EnumMember(Value = "USDT")]
-	Usdt,
+	[EnumMember(Value = "CANCELLED")]
+	Canceled,
 
 	/// <summary>
-	/// 
+	/// Invoice is reversed
 	/// </summary>
-	[EnumMember(Value = "GBP")]
-	Gbp,
+	[EnumMember(Value = "REVERSED")]
+	Reversed,
 
 	/// <summary>
 	/// <para>Catch-all for unknown values returned by Strike. If you encounter this, please check if there is a later version of the Strike.Client library.</para>

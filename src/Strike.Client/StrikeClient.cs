@@ -101,11 +101,8 @@ public sealed partial class StrikeClient
 	/// </summary>
 	public Dictionary<string, string>? AdditionalHeaders { get; } = [];
 
-	private ResponseParser PostAsync<TRequest>(string path, TRequest request) where TRequest : RequestBase
+	private ResponseParser PostAsync<TRequest>(string path, TRequest? request) where TRequest : RequestBase
 	{
-		if (request == null)
-			throw new ArgumentNullException(nameof(request));
-
 		var client = _clientFactory.CreateClient(HttpClientName);
 		var url = new Uri(_baseUrl, path);
 		_logger.LogTrace("Initiating request. Method: {Method}; Url: {Url}; Content: {@Content}", "POST", url, request);
@@ -115,19 +112,21 @@ public sealed partial class StrikeClient
 		{
 			Method = HttpMethod.Post,
 			RequestUri = url,
-			Content = JsonContent.Create(request, options: JsonSerializerOptions),
+			Content = request == null ? null : JsonContent.Create(request, options: JsonSerializerOptions),
 		};
 #pragma warning restore CA2000 // Dispose objects before losing scope
 
 		AddAuthenticationHeader(requestMessage);
 		AddRequestHeaders(requestMessage, AdditionalHeaders);
-		AddRequestHeaders(requestMessage, request.AdditionalHeaders);
+
+		if (request != null)
+			AddRequestHeaders(requestMessage, request.AdditionalHeaders);
 
 		return new ResponseParser
 		{
 			Message = client.SendAsync(requestMessage),
 			Url = url.ToString(),
-			IncludeRawJson = request.ShowRawJson ?? ShowRawJson,
+			IncludeRawJson = request?.ShowRawJson ?? ShowRawJson,
 			Logger = _logger,
 		};
 	}

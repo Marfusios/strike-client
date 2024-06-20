@@ -10,7 +10,7 @@ public sealed partial class StrikeClient
 	public AccountsClient Accounts => new(this);
 
 	/// <summary>
-	/// Payment Quotes API endpoints
+	/// Accounts API endpoints
 	/// </summary>
 	public record AccountsClient(StrikeClient Client)
 	{

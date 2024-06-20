@@ -55,9 +55,9 @@ public sealed class EnumConverterFactory : JsonConverterFactory
 
 		// Strike may return new/unknown values on parse. Don't crash at least...
 #if NETCOREAPP3_1_OR_GREATER
-		return Enum.Parse<T>("Undefined");
+		return Enum.Parse<T>("Undefined", true);
 #else
-		return (T)Enum.Parse(typeof(T), "Undefined");
+		return (T)Enum.Parse(typeof(T), "Undefined", true);
 #endif
 	}
 

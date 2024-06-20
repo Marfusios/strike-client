@@ -20,6 +20,11 @@ public record AccountProfile : ResponseBase
 	public string Handle { get; init; } = default!;
 
 	/// <summary>
+	/// Account LN address
+	/// </summary>
+	public string LnAddress => $"{Handle}@strike.me";
+
+	/// <summary>
 	/// Account avatar URL
 	/// </summary>
 	public string? AvatarUrl { get; init; }

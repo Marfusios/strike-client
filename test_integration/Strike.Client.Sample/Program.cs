@@ -6,6 +6,7 @@ using Serilog.Events;
 using Serilog.Extensions.Logging;
 using Serilog.Sinks.SystemConsole.Themes;
 using Strike.Client;
+using Strike.Client.Invoices;
 using Strike.Client.Models;
 using Strike.Client.PaymentQuotes;
 using Environment = Strike.Client.Environment;
@@ -31,8 +32,31 @@ var client = new StrikeClient(environment, apiKey, null, logger)
 	ShowRawJson = true
 };
 
+var invoice = await client.Invoices.IssueInvoice(new InvoiceReq
+{
+	Amount = new Money { Amount = 0.00001m, Currency = Currency.Btc },
+	Description = "Invoice from Strike .NET client"
+});
+Log.Information($"Invoice: {invoice.InvoiceId} with amount: {invoice.Amount.Amount} {invoice.Amount.Currency}");
+
+var invoiceQuote = await client.Invoices.IssueQuote(invoice.InvoiceId);
+
+var allInvoices = await client.Invoices.GetInvoices();
+
 var profile = await client.Accounts.GetProfile("marfusios");
 Log.Information($"Profile: {profile.Handle} and description: {profile.Description}");
+
+var balances = await client.Balances.GetBalances();
+foreach (var balance in balances)
+{
+	Log.Information($"Balance: {balance.Total} {balance.Currency}");
+}
+
+var rates = await client.Rates.GetRatesTicker();
+foreach (var rate in rates)
+{
+	Log.Information($"Rate: {rate.Amount} {rate.SourceCurrency}/{rate.TargetCurrency}");
+}
 
 var quote = await client.PaymentQuotes.CreateLnurlQuote(new CreateLnurlPaymentQuoteReq
 {

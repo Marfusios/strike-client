@@ -1,7 +1,7 @@
 ﻿namespace Strike.Client;
 
 /// <summary>
-/// Provides common members for all Strike API responses.
+/// Provides common members for all Strike API responses
 /// </summary>
 public abstract record ResponseBase
 {
@@ -9,7 +9,7 @@ public abstract record ResponseBase
 	/// Holds the raw json returned by the server
 	/// </summary>
 	[JsonIgnore]
-	public string? RawJson { get; set; }
+	public string? RawJson { get; internal set; }
 
 	/// <summary>
 	/// An error response given by the server
