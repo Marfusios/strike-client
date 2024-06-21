@@ -3,7 +3,7 @@
 /// <summary>
 /// A Strike Environment
 /// </summary>
-public enum Environment
+public enum StrikeEnvironment
 {
 	/// <summary>
 	/// Production Environment

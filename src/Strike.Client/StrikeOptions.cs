@@ -21,9 +21,9 @@ public class StrikeOptions
 
 	/// <summary>
 	/// Target Strike environment
-	/// <see cref="Client.Environment"/>: Development | Live
+	/// <see cref="StrikeEnvironment"/>: Development | Live
 	/// </summary>
-	public Environment Environment { get; set; } = Environment.Live;
+	public StrikeEnvironment Environment { get; set; } = StrikeEnvironment.Live;
 
 	/// <summary>
 	/// Name of the HTTP client used for dependency injection resolution.
@@ -33,12 +33,12 @@ public class StrikeOptions
 	/// <summary>
 	/// Get correct Strike url based on environment
 	/// </summary>
-	public static Uri ResolveServerUrl(Environment environment)
+	public static Uri ResolveServerUrl(StrikeEnvironment environment)
 	{
 		return environment switch
 		{
-			Environment.Development => new Uri("https://api.dev.strike.me/"),
-			Environment.Live => new Uri("https://api.strike.me/"),
+			StrikeEnvironment.Development => new Uri("https://api.dev.strike.me/"),
+			StrikeEnvironment.Live => new Uri("https://api.strike.me/"),
 			_ => throw new ArgumentOutOfRangeException(nameof(environment), "Invalid environment provided."),
 		};
 	}

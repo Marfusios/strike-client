@@ -11,7 +11,7 @@
 	<PropertyGroup Label="NuGet">
 		<PackageId>StrikeWallet.Client</PackageId>
 		<Title>StrikeWallet.Client</Title>
-		<Description>A client API for strike.me bitcoin and lightning service.</Description>
+		<Description>Client library for strike.me API, bitcoin and lightning services</Description>
 
 		<Authors>marfusios; Mariusz Kotas</Authors>
 		<PackageTags>bitcoin lightning payments api</PackageTags>

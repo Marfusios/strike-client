@@ -37,7 +37,7 @@ public sealed partial class StrikeClient
 	/// If the <paramref name="apiKey"/> is provided, it will be used on every call
 	/// </remarks>
 	public StrikeClient(
-		Environment environment,
+		StrikeEnvironment environment,
 		string? apiKey = null,
 		IHttpClientFactory? httpClientFactory = null,
 		ILogger<StrikeClient>? logger = null)
@@ -77,7 +77,7 @@ public sealed partial class StrikeClient
 	/// <summary>
 	/// Target Strike environment
 	/// </summary>
-	public Environment Environment { get; set; }
+	public StrikeEnvironment Environment { get; set; }
 
 	/// <summary>
 	/// The access token used for all API calls.
