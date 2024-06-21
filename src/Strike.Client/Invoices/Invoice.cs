@@ -6,7 +6,7 @@ namespace Strike.Client.Invoices;
 /// <summary>
 /// Issued invoice
 /// </summary>
-[DebuggerDisplay("Invoice {Amount}, desc: {Description} | {State}")]
+[DebuggerDisplay("Invoice {Amount} {Description} | {State}")]
 public record Invoice : ResponseBase
 {
 	public Guid InvoiceId { get; init; }

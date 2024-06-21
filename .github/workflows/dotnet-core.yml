@@ -22,6 +22,8 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test --no-restore --logger "trx;LogFileName=tests.trx"
+      env:
+          Strike__ApiKey: ${{secrets.STRIKE_API_KEY}}
     #- name: Test Report
     #  uses: dorny/test-reporter@v1
     #  if: success() || failure()    # run this step even if previous step failed

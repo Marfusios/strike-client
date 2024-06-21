@@ -13,7 +13,7 @@ https://docs.strike.me/api
 ### Features
 
 * installation via NuGet ([StrikeWallet.Client](https://www.nuget.org/packages/StrikeWallet.Client))
-* targeting .NET Standard 2.0 (.NET Core, Linux/MacOS compatible) + Standard 2.1, .NET 5-8
+* targeting .NET Standard 2.1 (.NET Core, Linux/MacOS compatible), .NET 5-8
 
 ### Usage
 
@@ -25,8 +25,28 @@ var client = new StrikeClient(environment, apiKey);
 var profile = await client.Accounts.GetProfile("marfusios");
 ```
 
+#### With dependency injection support:
+
+appsettings.json
+
+```json
+{
+  "Strike": {
+    "Environment": "Live",
+    "ApiKey": "YOUR_API_KEY"
+  }
+}
+```
+
+Startup.cs
+
+```csharp
+services.AddStrike();
+```
+
 More usage examples:
 * console sample ([link](test_integration/Strike.Client.Sample/Program.cs))
+* integration tests ([link](test_integration/Strike.Client.IntegrationTests))
 
 
 **Pull Requests are welcome!**

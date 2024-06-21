@@ -1,6 +1,9 @@
-﻿using Strike.Client.Models;
+﻿using System.Diagnostics;
+using Strike.Client.Models;
 
 namespace Strike.Client.Invoices;
+
+[DebuggerDisplay("Quote {TargetAmount} <-- {SourceAmount} {Description} | {Result}")]
 public record InvoiceQuote : ResponseBase
 {
 	/// <summary>

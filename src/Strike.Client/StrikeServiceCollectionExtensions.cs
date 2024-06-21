@@ -48,7 +48,7 @@ public static class StrikeServiceCollectionExtensions
 	/// </summary>
 	/// <param name="services">The <see cref="IServiceCollection"/> to add the services to</param>
 	/// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained</returns>
-	public static IServiceCollection AddStrikeClient(this IServiceCollection services) => services.AddSingleton<StrikeClient>();
+	public static IServiceCollection AddStrikeClient(this IServiceCollection services) => services.AddTransient<StrikeClient>();
 
 	/// <summary>
 	/// Registers a <c>"StrikeClient"</c> named HttpClient configured for Strike usage.
@@ -59,7 +59,7 @@ public static class StrikeServiceCollectionExtensions
 	public static IServiceCollection AddStrikeHttpClient(this IServiceCollection services, HttpClientHandler? handler = null)
 	{
 		services
-			.AddHttpClient(StrikeClient.HttpClientName)
+			.AddHttpClient(StrikeOptions.HttpClientName)
 			.ConfigurePrimaryHttpMessageHandler(() =>
 				handler ?? new HttpClientHandler
 				{

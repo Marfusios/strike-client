@@ -4,7 +4,7 @@
 		<AssemblyName>Strike.Client</AssemblyName>
 		<RootNamespace>Strike.Client</RootNamespace>
 
-		<TargetFrameworks>netstandard2.0;netcoreapp3.1;net6.0;net7.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>netcoreapp3.1;net6.0;net7.0;net8.0</TargetFrameworks>
 		<CheckEolTargetFramework>false</CheckEolTargetFramework>
 	</PropertyGroup>
 

@@ -1,6 +1,9 @@
 ﻿using System.Globalization;
 using System.Reflection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Events;
 using Serilog.Extensions.Logging;
@@ -9,10 +12,6 @@ using Strike.Client;
 using Strike.Client.Invoices;
 using Strike.Client.Models;
 using Strike.Client.PaymentQuotes;
-using Environment = Strike.Client.Environment;
-
-var apiKey = "YOUR_API_KEY";
-var environment = Environment.Live;
 
 using var logFactory = InitLogging();
 
@@ -26,20 +25,23 @@ Log.Debug("              STARTING              ");
 Log.Debug("====================================");
 
 var logger = logFactory.CreateLogger<StrikeClient>();
+var options = InitOptions();
 
-var client = new StrikeClient(environment, apiKey, null, logger)
+var client = new StrikeClient(options, null, logger)
 {
 	ShowRawJson = true
 };
 
 var invoice = await client.Invoices.IssueInvoice(new InvoiceReq
 {
-	Amount = new Money { Amount = 0.00001m, Currency = Currency.Btc },
+	Amount = new Money { Amount = 2m, Currency = Currency.Eur },
 	Description = "Invoice from Strike .NET client"
 });
 Log.Information($"Invoice: {invoice.InvoiceId} with amount: {invoice.Amount.Amount} {invoice.Amount.Currency}");
 
 var invoiceQuote = await client.Invoices.IssueQuote(invoice.InvoiceId);
+
+var foundQuote = await client.Invoices.FindQuote(invoiceQuote.QuoteId);
 
 var allInvoices = await client.Invoices.GetInvoices();
 
@@ -58,15 +60,18 @@ foreach (var rate in rates)
 	Log.Information($"Rate: {rate.Amount} {rate.SourceCurrency}/{rate.TargetCurrency}");
 }
 
-var quote = await client.PaymentQuotes.CreateLnurlQuote(new CreateLnurlPaymentQuoteReq
+var quote = await client.PaymentQuotes.CreateLnurlQuote(new LnurlPaymentQuoteReq
 {
-	LnAddressOrUrl = "marfusios@primal.net",
+	LnAddressOrUrl = "marfusios@getalby.com",
 	SourceCurrency = Currency.Eur,
-	Amount = new Money { Amount = 1m, Currency = Currency.Eur },
-	// Description = "Test desc"
+	Amount = new Money { Amount = 0.05m, Currency = Currency.Eur },
+	Description = "Payment by .NET client"
 });
 
 Log.Information($"Quote {quote.PaymentQuoteId}");
+
+//var executedPayment = await client.PaymentQuotes.ExecuteQuote(quote.PaymentQuoteId);
+//var foundPayment = await client.Payments.FindPayment(executedPayment.PaymentId);
 
 Log.Debug("====================================");
 Log.Debug("              STOPPING              ");
@@ -87,4 +92,19 @@ static SerilogLoggerFactory InitLogging()
 		.CreateLogger();
 	Log.Logger = logger;
 	return new SerilogLoggerFactory(logger);
+}
+
+static IOptions<StrikeOptions> InitOptions()
+{
+	var config = new ConfigurationBuilder()
+		.AddJsonFile("appsettings.json", optional: false)
+		.AddEnvironmentVariables()
+		.AddUserSecrets(Assembly.GetExecutingAssembly(), optional: true)
+		.Build();
+
+	var provider = new ServiceCollection()
+		.AddStrike(config)
+		.BuildServiceProvider();
+
+	return provider.GetRequiredService<IOptions<StrikeOptions>>();
 }

@@ -8,7 +8,7 @@ namespace Strike.Client;
 public sealed partial class StrikeClient
 {
 	/// <summary>
-	/// Initializes a new instance of the <see cref="StrikeClient"/> class using parameters that can all come from dependency injection.
+	/// Initializes a new instance of the <see cref="StrikeClient"/> class using parameters that can all come from dependency injection
 	/// </summary>
 	/// <param name="options"><see cref="StrikeOptions"/> initialized from an IConfiguration section</param>
 	/// <param name="httpClientFactory">A factory instance used to create <see cref="HttpClient" /> instances. If one is not provided, a service collection will be created and used instead. For more information, see <see href="https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests"/> for more information.</param>
@@ -19,37 +19,31 @@ public sealed partial class StrikeClient
 		ILogger<StrikeClient>? logger = null)
 		: this(
 			  options.Value.Environment,
-			  options.Value.AccessToken,
+			  options.Value.ApiKey,
 			  httpClientFactory: httpClientFactory,
 			  logger: logger)
 	{ }
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="StrikeClient"/> class.
+	/// Initializes a new instance of the <see cref="StrikeClient"/> class
 	/// </summary>
-	/// <param name="environment">The environment.</param>
-	/// <param name="accessToken">The access token.</param>
+	/// <param name="environment">The environment</param>
+	/// <param name="apiKey">The API key</param>
 	/// <param name="httpClientFactory">A factory instance used to create <see cref="HttpClient" /> instances. If one is not provided, a service collection will be created and used instead. For more information, see <see href="https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests"/> for more information.</param>
 	/// <param name="logger">A logging instance. Log entries will be provided at Information level at completion of each api call; and at Trace level with request and content details at the start and end of each api call. If not provided, a <see cref="NullLogger" /> instance will be used.</param>
 	/// <remarks>
 	/// Usage patterns: 
 	/// A single <see cref="StrikeClient"/> may be used for all API calls, or a separate one may be used for each
-	/// If the <paramref name="accessToken"/> is provided, it will be used on every call
+	/// If the <paramref name="apiKey"/> is provided, it will be used on every call
 	/// </remarks>
 	public StrikeClient(
 		Environment environment,
-		string? accessToken = null,
+		string? apiKey = null,
 		IHttpClientFactory? httpClientFactory = null,
 		ILogger<StrikeClient>? logger = null)
 	{
-		_baseUrl = environment switch
-		{
-			Environment.Development => new Uri("https://api.dev.strike.me/"),
-			Environment.Live => new Uri("https://api.strike.me/"),
-			_ => throw new ArgumentOutOfRangeException(nameof(environment), "Invalid environment provided."),
-		};
-
-		AccessToken = string.IsNullOrWhiteSpace(accessToken) ? null : accessToken;
+		Environment = environment;
+		ApiKey = string.IsNullOrWhiteSpace(apiKey) ? null : apiKey;
 
 		if (httpClientFactory == null)
 		{
@@ -64,7 +58,6 @@ public sealed partial class StrikeClient
 		_logger = logger ?? new NullLogger<StrikeClient>();
 	}
 
-	private readonly Uri _baseUrl;
 	private readonly IHttpClientFactory _clientFactory;
 	private readonly ILogger _logger;
 
@@ -82,14 +75,14 @@ public sealed partial class StrikeClient
 		.AddStrikeConverters();
 
 	/// <summary>
-	/// Name of the HTTP client used for dependency injection resolution.
+	/// Target Strike environment
 	/// </summary>
-	public static readonly string HttpClientName = "StrikeClient";
+	public Environment Environment { get; set; }
 
 	/// <summary>
 	/// The access token used for all API calls.
 	/// </summary>
-	public string? AccessToken { get; set; }
+	public string? ApiKey { get; set; }
 
 	/// <summary>
 	/// Debug option to include the raw json in the returned DTO
@@ -101,16 +94,37 @@ public sealed partial class StrikeClient
 	/// </summary>
 	public Dictionary<string, string>? AdditionalHeaders { get; } = [];
 
-	private ResponseParser PostAsync<TRequest>(string path, TRequest? request) where TRequest : RequestBase
+	private ResponseParser Post<TRequest>(string path, TRequest? request) where TRequest : RequestBase
 	{
-		var client = _clientFactory.CreateClient(HttpClientName);
-		var url = new Uri(_baseUrl, path);
-		_logger.LogTrace("Initiating request. Method: {Method}; Url: {Url}; Content: {@Content}", "POST", url, request);
+		return Send(path, HttpMethod.Post, request);
+	}
+
+	private ResponseParser Patch(string path)
+	{
+		return Send<RequestBase>(path, HttpMethod.Patch, null);
+	}
+
+	private ResponseParser Patch<TRequest>(string path, TRequest? request) where TRequest : RequestBase
+	{
+		return Send(path, HttpMethod.Patch, request);
+	}
+
+	private ResponseParser Get(string path)
+	{
+		return Send<RequestBase>(path, HttpMethod.Get, request: null);
+	}
+
+	private ResponseParser Send<TRequest>(string path, HttpMethod method, TRequest? request) where TRequest : RequestBase
+	{
+		var client = _clientFactory.CreateClient(StrikeOptions.HttpClientName);
+		var baseUrl = StrikeOptions.ResolveServerUrl(Environment);
+		var url = new Uri(baseUrl, path);
+		_logger.LogTrace("Initiating request. Method: {Method}; Url: {Url}; Content: {@Content}", method.Method.ToUpperInvariant(), url, request);
 
 #pragma warning disable CA2000 // Dispose objects before losing scope
 		var requestMessage = new HttpRequestMessage
 		{
-			Method = HttpMethod.Post,
+			Method = method,
 			RequestUri = url,
 			Content = request == null ? null : JsonContent.Create(request, options: JsonSerializerOptions),
 		};
@@ -131,35 +145,9 @@ public sealed partial class StrikeClient
 		};
 	}
 
-	private ResponseParser GetAsync(string path)
-	{
-		var client = _clientFactory.CreateClient(HttpClientName);
-		var url = new Uri(_baseUrl, path);
-		_logger.LogTrace("Initiating request. Method: {Method}; Url: {Url}", "GET", url);
-
-#pragma warning disable CA2000 // Dispose objects before losing scope
-		var requestMessage = new HttpRequestMessage
-		{
-			Method = HttpMethod.Get,
-			RequestUri = url
-		};
-#pragma warning restore CA2000 // Dispose objects before losing scope
-
-		AddAuthenticationHeader(requestMessage);
-		AddRequestHeaders(requestMessage, AdditionalHeaders);
-
-		return new ResponseParser
-		{
-			Message = client.SendAsync(requestMessage),
-			Url = url.ToString(),
-			IncludeRawJson = ShowRawJson,
-			Logger = _logger,
-		};
-	}
-
 	private void AddAuthenticationHeader(HttpRequestMessage requestMessage)
 	{
-		requestMessage.Headers.Add("Authorization", $"Bearer {AccessToken}");
+		requestMessage.Headers.Add("Authorization", $"Bearer {ApiKey}");
 	}
 
 	private static void AddRequestHeaders(HttpRequestMessage requestMessage, Dictionary<string, string>? headers)

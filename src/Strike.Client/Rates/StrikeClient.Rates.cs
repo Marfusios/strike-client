@@ -15,7 +15,7 @@ public sealed partial class StrikeClient
 		/// Get account balance details
 		/// </summary>
 		public Task<ResponseCollection<ConversionAmount>> GetRatesTicker() =>
-			Client.GetAsync("/v1/rates/ticker")
+			Client.Get("/v1/rates/ticker")
 				.ParseResponseAsync<ResponseCollection<ConversionAmount>>();
 	}
 }
