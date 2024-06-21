@@ -1,6 +1,7 @@
 ﻿using Strike.Client.Invoices;
 using Strike.Client.Models;
-using Strike.Client.PaymentQuotes;
+using Strike.Client.PaymentQuotes.Lightning;
+using Strike.Client.PaymentQuotes.Onchain;
 using Strike.Client.Payments;
 
 namespace Strike.Client.IntegrationTests;
@@ -25,6 +26,16 @@ public class PaymentTests : TestsBase
 		var payment = await client.PaymentQuotes.ExecuteQuote(quote.PaymentQuoteId);
 		AssertStatus(payment);
 		Assert.Equal(PaymentState.Completed, payment.State);
+	}
+
+	[SkippableFact]
+	public async Task GetLnurlDetails_ShouldWork()
+	{
+		var client = GetClient();
+
+		var details = await client.PaymentQuotes.GetLnurlDetails("frank_test@dev.strike.me");
+
+		AssertStatus(details);
 	}
 
 	[SkippableFact]
@@ -54,5 +65,39 @@ public class PaymentTests : TestsBase
 		var payment = await client.PaymentQuotes.ExecuteQuote(paymentQuote.PaymentQuoteId);
 		AssertStatus(payment);
 		Assert.Equal(PaymentState.Completed, payment.State);
+	}
+
+	[SkippableFact]
+	public async Task PayToOnchain_ShouldWork()
+	{
+		var client = GetClient();
+
+		var btcAddress = "tb1qggmknym2lw23e9vhjlqtddr3dkzkrz7860v3nc";
+		var targetAmount = new Money { Amount = 10m, Currency = Currency.Usd };
+
+		var tiers = await client.PaymentQuotes.GetOnchainTiers(new OnchainTiersReq
+		{
+			BtcAddress = btcAddress,
+			Amount = targetAmount
+		});
+
+		AssertStatus(tiers);
+		Assert.NotEmpty(tiers);
+
+		var selectedTier = tiers.Skip(1).First().Id;
+
+		var quote = await client.PaymentQuotes.CreateOnchainQuote(new OnchainPaymentQuoteReq
+		{
+			BtcAddress = btcAddress,
+			Amount = targetAmount,
+			SourceCurrency = targetAmount.Currency,
+			OnchainTierId = selectedTier
+		});
+		AssertStatus(quote);
+		Assert.True(quote.TotalAmount.Amount < 20m);
+
+		var payment = await client.PaymentQuotes.ExecuteQuote(quote.PaymentQuoteId);
+		AssertStatus(payment);
+		Assert.Equal(PaymentState.Pending, payment.State);
 	}
 }

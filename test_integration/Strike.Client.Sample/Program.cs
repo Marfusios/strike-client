@@ -11,7 +11,7 @@ using Serilog.Sinks.SystemConsole.Themes;
 using Strike.Client;
 using Strike.Client.Invoices;
 using Strike.Client.Models;
-using Strike.Client.PaymentQuotes;
+using Strike.Client.PaymentQuotes.Lightning;
 
 using var logFactory = InitLogging();
 

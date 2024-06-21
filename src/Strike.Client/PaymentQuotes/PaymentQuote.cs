@@ -1,11 +1,7 @@
 ﻿using Strike.Client.Models;
 
 namespace Strike.Client.PaymentQuotes;
-
-/// <summary>
-/// 
-/// </summary>
-public record LnPaymentQuote : ResponseBase
+public record PaymentQuote : ResponseBase
 {
 	/// <summary>
 	/// <para>The payment quote's ID</para>
@@ -46,10 +42,4 @@ public record LnPaymentQuote : ResponseBase
 	/// <para>The reward that the sender might receive, if applicable</para>
 	/// </summary>
 	public Money? Reward { get; init; }
-
-	/// <summary>
-	/// <para>The fee required by LN network</para>
-	/// </summary>
-	public Money? LightningNetworkFee { get; init; }
 }
-

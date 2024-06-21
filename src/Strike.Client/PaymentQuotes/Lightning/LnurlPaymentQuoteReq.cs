@@ -1,6 +1,6 @@
 ﻿using Strike.Client.Models;
 
-namespace Strike.Client.PaymentQuotes;
+namespace Strike.Client.PaymentQuotes.Lightning;
 
 /// <summary>
 /// LNURL request
