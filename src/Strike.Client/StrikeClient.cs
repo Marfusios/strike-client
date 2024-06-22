@@ -87,6 +87,12 @@ public sealed partial class StrikeClient
 			.AddStrikeConverters();
 
 	/// <summary>
+	/// Set true if any unsuccessful response should throw StrikeApiException.
+	/// Default: false
+	/// </summary>
+	public bool ThrowOnError { get; set; }
+
+	/// <summary>
 	/// Target Strike environment
 	/// </summary>
 	public StrikeEnvironment Environment
@@ -113,7 +119,7 @@ public sealed partial class StrikeClient
 		set
 		{
 			_serverUrl = value;
-			Environment = StrikeEnvironment.Custom;
+			_environment = StrikeEnvironment.Custom;
 		}
 	}
 
@@ -166,7 +172,7 @@ public sealed partial class StrikeClient
 		{
 			Method = method,
 			RequestUri = url,
-			Content = request == null ? null : JsonContent.Create(request, options: JsonSerializerOptions),
+			Content = request == null ? null : JsonContent.Create(request, options: JsonSerializerOptions)
 		};
 #pragma warning restore CA2000 // Dispose objects before losing scope
 
@@ -182,6 +188,7 @@ public sealed partial class StrikeClient
 			Url = url.ToString(),
 			IncludeRawJson = request?.ShowRawJson ?? ShowRawJson,
 			Logger = _logger,
+			ThrowOnError = ThrowOnError
 		};
 	}
 
@@ -206,6 +213,7 @@ public sealed partial class StrikeClient
 		public Task<HttpResponseMessage> Message { get; init; }
 		public string Url { get; init; }
 		public bool IncludeRawJson { get; init; }
+		public bool ThrowOnError { get; init; }
 		public ILogger Logger { get; init; }
 
 		public async Task<TResponse> ParseResponseAsync<TResponse>() where TResponse : ResponseBase, new()
@@ -247,7 +255,13 @@ public sealed partial class StrikeClient
 			{
 				var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-				var error = ParseError((int)response.StatusCode, json);
+				var statusCode = (int)response.StatusCode;
+				var error = ParseError(statusCode, json);
+
+				if (ThrowOnError)
+					throw new StrikeApiException(
+						$"API error, status: {statusCode}, error: {error.Data.Code} {error.Data.Message}");
+
 				var result = new TResponse { Error = error, StatusCode = response.StatusCode };
 
 				if (IncludeRawJson)
