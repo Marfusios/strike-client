@@ -13,5 +13,10 @@ public enum StrikeEnvironment
 	/// <summary>
 	/// Development Environment
 	/// </summary>
-	Development
+	Development,
+
+	/// <summary>
+	/// Custom, please provide server URL
+	/// </summary>
+	Custom
 }

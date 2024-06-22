@@ -7,6 +7,9 @@ namespace Strike.Client;
 /// </summary>
 public sealed partial class StrikeClient
 {
+	public static readonly Uri LiveServerUrl = new("https://api.strike.me/");
+	public static readonly Uri DevelopmentServerUrl = new("https://api.dev.strike.me/");
+
 	/// <summary>
 	/// Initializes a new instance of the <see cref="StrikeClient"/> class using parameters that can all come from dependency injection
 	/// </summary>
@@ -18,11 +21,13 @@ public sealed partial class StrikeClient
 		IHttpClientFactory? httpClientFactory = null,
 		ILogger<StrikeClient>? logger = null)
 		: this(
-			  options.Value.Environment,
-			  options.Value.ApiKey,
-			  httpClientFactory: httpClientFactory,
-			  logger: logger)
-	{ }
+			options.Value.Environment,
+			options.Value.ApiKey,
+			httpClientFactory: httpClientFactory,
+			logger: logger,
+			serverUrl: options.Value.ServerUrl)
+	{
+	}
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="StrikeClient"/> class
@@ -31,6 +36,7 @@ public sealed partial class StrikeClient
 	/// <param name="apiKey">The API key</param>
 	/// <param name="httpClientFactory">A factory instance used to create <see cref="HttpClient" /> instances. If one is not provided, a service collection will be created and used instead. For more information, see <see href="https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests"/> for more information.</param>
 	/// <param name="logger">A logging instance. Log entries will be provided at Information level at completion of each api call; and at Trace level with request and content details at the start and end of each api call. If not provided, a <see cref="NullLogger" /> instance will be used.</param>
+	/// <param name="serverUrl">Optional custom server url if you don't want to use predefined one based on environment</param>
 	/// <remarks>
 	/// Usage patterns: 
 	/// A single <see cref="StrikeClient"/> may be used for all API calls, or a separate one may be used for each
@@ -40,9 +46,13 @@ public sealed partial class StrikeClient
 		StrikeEnvironment environment,
 		string? apiKey = null,
 		IHttpClientFactory? httpClientFactory = null,
-		ILogger<StrikeClient>? logger = null)
+		ILogger<StrikeClient>? logger = null,
+		Uri? serverUrl = null)
 	{
-		Environment = environment;
+		if (serverUrl != null)
+			ServerUrl = serverUrl;
+		else
+			Environment = environment;
 		ApiKey = string.IsNullOrWhiteSpace(apiKey) ? null : apiKey;
 
 		if (httpClientFactory == null)
@@ -60,9 +70,11 @@ public sealed partial class StrikeClient
 
 	private readonly IHttpClientFactory _clientFactory;
 	private readonly ILogger _logger;
+	private Uri _serverUrl = LiveServerUrl;
+	private StrikeEnvironment _environment = StrikeEnvironment.Live;
 
 	internal static readonly JsonSerializerOptions JsonSerializerOptions =
-		new JsonSerializerOptions()
+		new JsonSerializerOptions
 		{
 #if DEBUG
 			WriteIndented = true,
@@ -72,12 +84,38 @@ public sealed partial class StrikeClient
 			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
 			PropertyNameCaseInsensitive = true,
 		}
-		.AddStrikeConverters();
+			.AddStrikeConverters();
 
 	/// <summary>
 	/// Target Strike environment
 	/// </summary>
-	public StrikeEnvironment Environment { get; set; }
+	public StrikeEnvironment Environment
+	{
+		get => _environment;
+		set
+		{
+			_serverUrl = value switch
+			{
+				StrikeEnvironment.Live => LiveServerUrl,
+				StrikeEnvironment.Development => DevelopmentServerUrl,
+				_ => throw new InvalidOperationException("Please configure ServerUrl instead of custom environment")
+			};
+			_environment = value;
+		}
+	}
+
+	/// <summary>
+	/// Target Strike server URL, it is automatically derived from Environment unless you set it manually
+	/// </summary>
+	public Uri ServerUrl
+	{
+		get => _serverUrl;
+		set
+		{
+			_serverUrl = value;
+			Environment = StrikeEnvironment.Custom;
+		}
+	}
 
 	/// <summary>
 	/// The access token used for all API calls.
@@ -114,12 +152,14 @@ public sealed partial class StrikeClient
 		return Send<RequestBase>(path, HttpMethod.Get, request: null);
 	}
 
-	private ResponseParser Send<TRequest>(string path, HttpMethod method, TRequest? request) where TRequest : RequestBase
+	private ResponseParser Send<TRequest>(string path, HttpMethod method, TRequest? request)
+		where TRequest : RequestBase
 	{
 		var client = _clientFactory.CreateClient(StrikeOptions.HttpClientName);
-		var baseUrl = StrikeOptions.ResolveServerUrl(Environment);
+		var baseUrl = _serverUrl;
 		var url = new Uri(baseUrl, path);
-		_logger.LogTrace("Initiating request. Method: {Method}; Url: {Url}; Content: {@Content}", method.Method.ToUpperInvariant(), url, request);
+		_logger.LogTrace("Initiating request. Method: {Method}; Url: {Url}; Content: {@Content}",
+			method.Method.ToUpperInvariant(), url, request);
 
 #pragma warning disable CA2000 // Dispose objects before losing scope
 		var requestMessage = new HttpRequestMessage
@@ -172,7 +212,8 @@ public sealed partial class StrikeClient
 		{
 			using var response = await Message.ConfigureAwait(false);
 
-			Logger.LogInformation("Completed request. Url: {Url}, Status Code: {StatusCode}.", Url, response.StatusCode);
+			Logger.LogInformation("Completed request. Url: {Url}, Status Code: {StatusCode}.", Url,
+				response.StatusCode);
 
 			var result = await BuildResponse<TResponse>(response).ConfigureAwait(false);
 			Logger.LogTrace("Completed request details. Url: {Url}; Response: {@Result}",
@@ -181,7 +222,8 @@ public sealed partial class StrikeClient
 			return result;
 		}
 
-		private async Task<TResponse> BuildResponse<TResponse>(HttpResponseMessage response) where TResponse : ResponseBase, new()
+		private async Task<TResponse> BuildResponse<TResponse>(HttpResponseMessage response)
+			where TResponse : ResponseBase, new()
 		{
 			if (response.IsSuccessStatusCode)
 			{
@@ -195,7 +237,8 @@ public sealed partial class StrikeClient
 				}
 				else
 				{
-					var result = await response.Content.ReadFromJsonAsync<TResponse>(options: JsonSerializerOptions).ConfigureAwait(false);
+					var result = await response.Content.ReadFromJsonAsync<TResponse>(options: JsonSerializerOptions)
+						.ConfigureAwait(false);
 					result!.StatusCode = response.StatusCode;
 					return result;
 				}
@@ -205,11 +248,7 @@ public sealed partial class StrikeClient
 				var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
 				var error = ParseError((int)response.StatusCode, json);
-				var result = new TResponse
-				{
-					Error = error,
-					StatusCode = response.StatusCode,
-				};
+				var result = new TResponse { Error = error, StatusCode = response.StatusCode };
 
 				if (IncludeRawJson)
 					result.RawJson = json;
@@ -227,12 +266,7 @@ public sealed partial class StrikeClient
 			{
 				return new StrikeError
 				{
-					Data = new StrikeApiError
-					{
-						Status = statusCode,
-						Code = "API_UNAVAILABLE",
-						Message = ex.Message
-					}
+					Data = new StrikeApiError { Status = statusCode, Code = "API_UNAVAILABLE", Message = ex.Message }
 				};
 			}
 		}

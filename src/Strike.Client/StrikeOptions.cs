@@ -26,20 +26,12 @@ public class StrikeOptions
 	public StrikeEnvironment Environment { get; set; } = StrikeEnvironment.Live;
 
 	/// <summary>
+	/// Optional custom server url if you want to override predefined environments
+	/// </summary>
+	public Uri? ServerUrl { get; set; }
+
+	/// <summary>
 	/// Name of the HTTP client used for dependency injection resolution.
 	/// </summary>
 	public const string HttpClientName = "StrikeClient";
-
-	/// <summary>
-	/// Get correct Strike url based on environment
-	/// </summary>
-	public static Uri ResolveServerUrl(StrikeEnvironment environment)
-	{
-		return environment switch
-		{
-			StrikeEnvironment.Development => new Uri("https://api.dev.strike.me/"),
-			StrikeEnvironment.Live => new Uri("https://api.strike.me/"),
-			_ => throw new ArgumentOutOfRangeException(nameof(environment), "Invalid environment provided."),
-		};
-	}
 }
