@@ -43,7 +43,7 @@ public sealed partial class StrikeClient
 		/// Issue a new quote for the target invoice
 		/// </summary>
 		public Task<InvoiceQuote> IssueQuote(Guid invoiceId, InvoiceQuoteReq? request = null) =>
-			Client.Post($"/v1/invoices/{invoiceId}/quote", request)
+			Client.Post($"/v1/invoices/{invoiceId}/quote{GetDescriptionParam(request)}", request)
 				.ParseResponseAsync<InvoiceQuote>();
 
 		/// <summary>
@@ -52,5 +52,10 @@ public sealed partial class StrikeClient
 		public Task<InvoiceQuote> FindQuote(Guid quoteId) =>
 			Client.Get($"/v1/quotes/{quoteId}")
 				.ParseResponseAsync<InvoiceQuote>();
+
+		private string GetDescriptionParam(InvoiceQuoteReq? request) =>
+			string.IsNullOrWhiteSpace(request?.DescriptionHash) ?
+				string.Empty :
+				$"?descriptionHash={request.DescriptionHash}";
 	}
 }
