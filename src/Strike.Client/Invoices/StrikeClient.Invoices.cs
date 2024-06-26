@@ -53,7 +53,7 @@ public sealed partial class StrikeClient
 			Client.Get($"/v1/quotes/{quoteId}")
 				.ParseResponseAsync<InvoiceQuote>();
 
-		private string GetDescriptionParam(InvoiceQuoteReq? request) =>
+		private static string GetDescriptionParam(InvoiceQuoteReq? request) =>
 			string.IsNullOrWhiteSpace(request?.DescriptionHash) ?
 				string.Empty :
 				$"?descriptionHash={request.DescriptionHash}";
