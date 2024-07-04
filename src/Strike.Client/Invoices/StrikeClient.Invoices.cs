@@ -40,6 +40,13 @@ public sealed partial class StrikeClient
 				.ParseResponseAsync<InvoicesCollection>();
 
 		/// <summary>
+		/// Get all invoices filtered by OData query
+		/// </summary>
+		public Task<InvoicesCollection> GetInvoicesFilter(string filter, int top = 100, int skip = 0) =>
+			Client.Get($"/v1/invoices?$top={top}&$skip={skip}&$filter={filter}")
+				.ParseResponseAsync<InvoicesCollection>();
+
+		/// <summary>
 		/// Issue a new quote for the target invoice
 		/// </summary>
 		public Task<InvoiceQuote> IssueQuote(Guid invoiceId, InvoiceQuoteReq? request = null) =>

@@ -33,6 +33,10 @@ public class InvoicesTests : TestsBase
 		var allInvoices = await client.Invoices.GetInvoices();
 		AssertStatus(allInvoices);
 		Assert.NotEmpty(allInvoices.Items);
+		
+		var invoicesFiltered = await client.Invoices.GetInvoicesFilter($"invoiceId in ('{invoice.InvoiceId}')");
+		AssertStatus(invoicesFiltered);
+		Assert.NotEmpty(invoicesFiltered.Items);
 	}
 
 	[SkippableFact]
