@@ -23,7 +23,7 @@ public sealed partial class StrikeClient
 		/// </summary>
 		public Task<LnPaymentQuote> CreateLnQuote(LnPaymentQuoteReq request) =>
 			Client.Post("/v1/payment-quotes/lightning", request)
-				.ParseResponseAsync<LnPaymentQuote>();
+				.ParseResponse<LnPaymentQuote>();
 
 		/// <summary>
 		/// Create LNURL/LN address payment quote
@@ -32,14 +32,14 @@ public sealed partial class StrikeClient
 		/// </summary>
 		public Task<LnPaymentQuote> CreateLnurlQuote(LnurlPaymentQuoteReq request) =>
 			Client.Post("/v1/payment-quotes/lightning/lnurl", request)
-				.ParseResponseAsync<LnPaymentQuote>();
+				.ParseResponse<LnPaymentQuote>();
 
 		/// <summary>
 		/// Get LNURL details
 		/// </summary>
 		public Task<LnurlDetails> GetLnurlDetails(string lnAddressOrUrl) =>
 			Client.Get($"/v1/payment-quotes/lightning/lnurl/{lnAddressOrUrl}")
-				.ParseResponseAsync<LnurlDetails>();
+				.ParseResponse<LnurlDetails>();
 
 		/// <summary>
 		/// Create onchain payment quote
@@ -48,20 +48,20 @@ public sealed partial class StrikeClient
 		/// </summary>
 		public Task<OnchainPaymentQuote> CreateOnchainQuote(OnchainPaymentQuoteReq request) =>
 			Client.Post("/v1/payment-quotes/onchain", request)
-				.ParseResponseAsync<OnchainPaymentQuote>();
+				.ParseResponse<OnchainPaymentQuote>();
 
 		/// <summary>
 		/// Get available onchain tiers
 		/// </summary>
 		public Task<ResponseCollection<OnchainTier>> GetOnchainTiers(OnchainTiersReq request) =>
 			Client.Post("/v1/payment-quotes/onchain/tiers", request)
-				.ParseResponseAsync<ResponseCollection<OnchainTier>>();
+				.ParseResponse<ResponseCollection<OnchainTier>>();
 
 		/// <summary>
 		/// Execute payment quote and send bitcoin
 		/// </summary>
 		public Task<Payment> ExecuteQuote(Guid quoteId) =>
 			Client.Patch($"/v1/payment-quotes/{quoteId}/execute")
-				.ParseResponseAsync<Payment>();
+				.ParseResponse<Payment>();
 	}
 }

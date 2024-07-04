@@ -19,6 +19,6 @@ public sealed partial class StrikeClient
 		/// </summary>
 		public Task<ResponseCollection<Balance>> GetBalances() =>
 			Client.Get("/v1/balances")
-				.ParseResponseAsync<ResponseCollection<Balance>>();
+				.ParseResponse<ResponseCollection<Balance>>();
 	}
 }

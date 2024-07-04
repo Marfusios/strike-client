@@ -16,6 +16,6 @@ public sealed partial class StrikeClient
 		/// </summary>
 		public Task<ResponseCollection<ConversionAmount>> GetRatesTicker() =>
 			Client.Get("/v1/rates/ticker")
-				.ParseResponseAsync<ResponseCollection<ConversionAmount>>();
+				.ParseResponse<ResponseCollection<ConversionAmount>>();
 	}
 }

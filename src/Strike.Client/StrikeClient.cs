@@ -1,4 +1,6 @@
-﻿using Strike.Client.Converters;
+﻿using OData.QueryBuilder.Builders;
+using OData.QueryBuilder.Conventions.AddressingEntities.Query;
+using Strike.Client.Converters;
 
 namespace Strike.Client;
 
@@ -184,6 +186,7 @@ public sealed partial class StrikeClient
 
 		return new ResponseParser
 		{
+			Request = requestMessage,
 			Message = client.SendAsync(requestMessage),
 			Url = url.ToString(),
 			IncludeRawJson = request?.ShowRawJson ?? ShowRawJson,
@@ -208,26 +211,43 @@ public sealed partial class StrikeClient
 		}
 	}
 
+	private static string ResolveQuery<T>(Action<IODataQueryCollection<T>> query)
+	{
+		var builder = new ODataQueryBuilder("https://builder.local");
+		var collection = builder.For<T>("local").ByList();
+		query(collection);
+		var uri = collection.ToUri();
+		return uri.Query;
+	}
+
 	private readonly struct ResponseParser
 	{
+		public HttpRequestMessage Request { get; init; }
 		public Task<HttpResponseMessage> Message { get; init; }
 		public string Url { get; init; }
 		public bool IncludeRawJson { get; init; }
 		public bool ThrowOnError { get; init; }
 		public ILogger Logger { get; init; }
 
-		public async Task<TResponse> ParseResponseAsync<TResponse>() where TResponse : ResponseBase, new()
+		public async Task<TResponse> ParseResponse<TResponse>() where TResponse : ResponseBase, new()
 		{
-			using var response = await Message.ConfigureAwait(false);
+			try
+			{
+				using var response = await Message.ConfigureAwait(false);
 
-			Logger.LogInformation("Completed request. Url: {Url}, Status Code: {StatusCode}.", Url,
-				response.StatusCode);
+				Logger.LogInformation("Completed request. Url: {Url}, Status Code: {StatusCode}.", Url,
+					response.StatusCode);
 
-			var result = await BuildResponse<TResponse>(response).ConfigureAwait(false);
-			Logger.LogTrace("Completed request details. Url: {Url}; Response: {@Result}",
-				Url,
-				result);
-			return result;
+				var result = await BuildResponse<TResponse>(response).ConfigureAwait(false);
+				Logger.LogTrace("Completed request details. Url: {Url}; Response: {@Result}",
+					Url,
+					result);
+				return result;
+			}
+			finally
+			{
+				Request.Dispose();
+			}
 		}
 
 		private async Task<TResponse> BuildResponse<TResponse>(HttpResponseMessage response)

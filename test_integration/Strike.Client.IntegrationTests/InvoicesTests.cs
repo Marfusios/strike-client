@@ -34,9 +34,18 @@ public class InvoicesTests : TestsBase
 		AssertStatus(allInvoices);
 		Assert.NotEmpty(allInvoices.Items);
 
-		var invoicesFiltered = await client.Invoices.GetInvoicesFilter($"invoiceId in ('{invoice.InvoiceId}')");
+		var invoicesFiltered = await client.Invoices.GetInvoices($"invoiceId in ('{invoice.InvoiceId}')");
 		AssertStatus(invoicesFiltered);
 		Assert.NotEmpty(invoicesFiltered.Items);
+
+		var ids = new[] { invoice.InvoiceId };
+		var invoicesFilteredByBuilder = await client.Invoices.GetInvoices(builder => builder
+			.Filter((e, f, o) => o.In(e.InvoiceId, ids))
+			.OrderBy(x => x.Created)
+			.Skip(0)
+			.Top(10));
+		AssertStatus(invoicesFilteredByBuilder);
+		Assert.NotEmpty(invoicesFilteredByBuilder.Items);
 	}
 
 	[SkippableFact]

@@ -21,4 +21,8 @@
 		<Using Include="Xunit" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\..\src\Strike.Client\Strike.Client.csproj" />
+	</ItemGroup>
+
 </Project>

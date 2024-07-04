@@ -19,6 +19,6 @@ public sealed partial class StrikeClient
 		/// </summary>
 		public Task<Payment> FindPayment(Guid paymentId) =>
 			Client.Get($"/v1/payments/{paymentId}")
-				.ParseResponseAsync<Payment>();
+				.ParseResponse<Payment>();
 	}
 }
