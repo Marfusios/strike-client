@@ -15,7 +15,7 @@ public class CurrencyExchangesTests : TestsBase
 			Buy = Currency.Usd,
 			Amount = new CurrencyExchangeAmount
 			{
-				Amount = 0.00001m,
+				Amount = 0.000001m,
 				Currency = Currency.Btc,
 				FeePolicy = FeePolicy.Exclusive
 			}

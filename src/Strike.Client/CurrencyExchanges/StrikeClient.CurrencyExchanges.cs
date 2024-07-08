@@ -20,7 +20,7 @@ public sealed partial class StrikeClient
 		public Task<CurrencyExchangeQuote> PostCurrencyExchangeQuote(CurrencyExchangeQuoteReq req) =>
 			Client.Post("/v1/currency-exchange-quotes", req)
 				.ParseResponse<CurrencyExchangeQuote>();
-		
+
 		/// <summary>
 		/// Execute currency exchange
 		/// </summary>
