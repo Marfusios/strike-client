@@ -17,7 +17,7 @@ public sealed partial class StrikeClient
 		/// <summary>
 		/// Get account balance details
 		/// </summary>
-		public Task<CurrencyExchangeQuote> PostCurrencyExchangeQuotes(CurrencyExchangeQuoteReq req) =>
+		public Task<CurrencyExchangeQuote> PostCurrencyExchangeQuote(CurrencyExchangeQuoteReq req) =>
 			Client.Post("/v1/currency-exchange-quotes", req)
 				.ParseResponse<CurrencyExchangeQuote>();
 	}
