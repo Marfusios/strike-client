@@ -22,6 +22,14 @@ public class CurrencyExchangesTests : TestsBase
 		});
 		
 		AssertStatus(exchangeQuote);
+
+		var getQuote = await client.CurrencyExchanges.GetCurrencyExchangeQuote(exchangeQuote.Id);
+		
+		AssertStatus(getQuote);
+
+		var exec = await client.CurrencyExchanges.PatchExecuteQuote(exchangeQuote.Id);
+		
+		AssertStatus(exec);
 	}
 
 }
