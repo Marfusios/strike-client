@@ -27,7 +27,7 @@ public sealed partial class StrikeClient
 		public Task<CurrencyExchangeExecute> PatchExecuteQuote(Guid quoteId) =>
 			Client.Patch($"/v1/currency-exchange-quotes/{quoteId}/execute")
 				.ParseResponse<CurrencyExchangeExecute>();
-		
+
 		/// <summary>
 		/// Get currency exchange quote by id
 		/// </summary>
