@@ -1,6 +1,4 @@
-﻿using OData.QueryBuilder.Builders;
-using OData.QueryBuilder.Conventions.AddressingEntities.Query;
-using Strike.Client.Converters;
+﻿using Strike.Client.Converters;
 
 namespace Strike.Client;
 
@@ -209,15 +207,6 @@ public sealed partial class StrikeClient
 				requestMessage.Headers.Add(header.Key, header.Value);
 			}
 		}
-	}
-
-	private static string ResolveQuery<T>(Action<IODataQueryCollection<T>> query)
-	{
-		var builder = new ODataQueryBuilder("https://builder.local");
-		var collection = builder.For<T>("local").ByList();
-		query(collection);
-		var uri = collection.ToUri();
-		return uri.Query;
 	}
 
 	private readonly struct ResponseParser

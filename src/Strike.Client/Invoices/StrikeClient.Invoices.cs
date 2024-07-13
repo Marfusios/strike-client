@@ -1,5 +1,4 @@
-﻿using OData.QueryBuilder.Conventions.AddressingEntities.Query;
-using Strike.Client.Invoices;
+﻿using Strike.Client.Invoices;
 
 namespace Strike.Client;
 
@@ -45,15 +44,6 @@ public sealed partial class StrikeClient
 		/// </summary>
 		public Task<InvoicesCollection> GetInvoices(string filter, int top = 100, int skip = 0) =>
 			Client.Get($"/v1/invoices?$top={top}&$skip={skip}&$filter={filter}")
-				.ParseResponse<InvoicesCollection>();
-
-		/// <summary>
-		/// Get all invoices filtered by OData query.
-		/// Supported properties for filter: invoiceId, created, currency, state, issuerId, receiverId, payerId, correlationId.
-		/// Supported properties for orderBy: created.
-		/// </summary>
-		public Task<InvoicesCollection> GetInvoices(Action<IODataQueryCollection<Invoice>> query) =>
-			Client.Get($"/v1/invoices{ResolveQuery(query)}")
 				.ParseResponse<InvoicesCollection>();
 
 		/// <summary>
