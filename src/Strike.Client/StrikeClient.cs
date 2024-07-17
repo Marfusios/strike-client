@@ -1,6 +1,4 @@
-﻿using OData.QueryBuilder.Builders;
-using OData.QueryBuilder.Conventions.AddressingEntities.Query;
-using Strike.Client.Converters;
+﻿using Strike.Client.Converters;
 
 namespace Strike.Client;
 
@@ -211,15 +209,6 @@ public sealed partial class StrikeClient
 		}
 	}
 
-	private static string ResolveQuery<T>(Action<IODataQueryCollection<T>> query)
-	{
-		var builder = new ODataQueryBuilder("https://builder.local");
-		var collection = builder.For<T>("local").ByList();
-		query(collection);
-		var uri = collection.ToUri();
-		return uri.Query;
-	}
-
 	private readonly struct ResponseParser
 	{
 		public HttpRequestMessage Request { get; init; }
@@ -255,21 +244,21 @@ public sealed partial class StrikeClient
 		{
 			if (response.IsSuccessStatusCode)
 			{
+				var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+				// some APIs like PATCH /v1/currency-exchange-quotes/ return empty response
+				if (String.IsNullOrWhiteSpace(json))
+					json = "{}";
+				
+				var result = JsonSerializer.Deserialize<TResponse>(json, options: JsonSerializerOptions);
+				result!.StatusCode = response.StatusCode;
+
 				if (IncludeRawJson)
 				{
-					var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-					var result = JsonSerializer.Deserialize<TResponse>(json, options: JsonSerializerOptions);
 					result!.RawJson = json;
-					result.StatusCode = response.StatusCode;
-					return result;
 				}
-				else
-				{
-					var result = await response.Content.ReadFromJsonAsync<TResponse>(options: JsonSerializerOptions)
-						.ConfigureAwait(false);
-					result!.StatusCode = response.StatusCode;
-					return result;
-				}
+
+				return result;
+
 			}
 			else
 			{
