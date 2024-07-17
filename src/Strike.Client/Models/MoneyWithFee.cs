@@ -9,7 +9,7 @@ namespace Strike.Client.Models;
 public class MoneyWithFee : Money
 {
 	/// <summary>
-	/// <para>Should the fee be included in the amount or added on top of it.</para>
+	/// <para>Should the fee be included in the amount or added on top of it. Optional param, usually the default is EXCLUSIVE</para>
 	/// </summary>
-	public FeePolicy FeePolicy { get; set; }
+	public FeePolicy? FeePolicy { get; set; }
 }
