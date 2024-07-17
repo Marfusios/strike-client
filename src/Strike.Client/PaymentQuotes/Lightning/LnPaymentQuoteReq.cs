@@ -5,7 +5,7 @@ namespace Strike.Client.PaymentQuotes.Lightning;
 /// <summary>
 /// LN request
 /// </summary>
-public partial class LnPaymentQuoteReq : RequestBase
+public partial class LnPaymentQuoteReq : IdempotentRequestBase
 {
 	/// <summary>
 	/// LN invoice to pay

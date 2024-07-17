@@ -23,3 +23,16 @@ public abstract class RequestBase
 	[JsonIgnore]
 	public Dictionary<string, string>? AdditionalHeaders { get; init; }
 }
+
+/// <summary>
+/// Provides methods and properties for making an idempotent request (protection against double execution).
+/// </summary>
+public abstract class IdempotentRequestBase : RequestBase
+{
+	/// <summary>
+	/// Set optional unique idempotency key to prevent double execution.
+	/// In case of a duplicate request, the error code `DUPLICATE_XXX` containing data from the original response will be returned.
+	/// The key should be a random v4 UUID to avoid false collisions. 
+	/// </summary>
+	public Guid? IdempotencyKey { get; set; }
+}

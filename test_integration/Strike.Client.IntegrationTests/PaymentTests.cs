@@ -1,4 +1,5 @@
-﻿using Strike.Client.Invoices;
+﻿using System.Net;
+using Strike.Client.Invoices;
 using Strike.Client.Models;
 using Strike.Client.PaymentQuotes.Lightning;
 using Strike.Client.PaymentQuotes.Onchain;
@@ -99,5 +100,25 @@ public class PaymentTests : TestsBase
 		var payment = await client.PaymentQuotes.ExecuteQuote(quote.PaymentQuoteId);
 		AssertStatus(payment);
 		Assert.Equal(PaymentState.Pending, payment.State);
+	}
+
+	[SkippableFact]
+	public async Task IdempotencyProtection_ShouldWork()
+	{
+		var client = GetClient();
+
+		var idempotentId = Guid.Parse("4822bd76-7f73-45c2-8788-69cc9017cf75");
+		var quote = await client.PaymentQuotes.CreateLnurlQuote(new LnurlPaymentQuoteReq
+		{
+			LnAddressOrUrl = "frank_test@dev.strike.me",
+			SourceCurrency = Currency.Usd,
+			Amount = new Money { Amount = 0.05m, Currency = Currency.Usd },
+			Description = "Payment by .NET client integration tests",
+			IdempotencyKey = idempotentId
+		});
+
+		Assert.False(quote.IsSuccessStatusCode);
+		Assert.Equal(HttpStatusCode.UnprocessableContent, quote.StatusCode);
+		Assert.Equal("DUPLICATE_PAYMENT_QUOTE", quote.Error?.Data.Code);
 	}
 }

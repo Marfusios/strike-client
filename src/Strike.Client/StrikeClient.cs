@@ -177,6 +177,7 @@ public sealed partial class StrikeClient
 #pragma warning restore CA2000 // Dispose objects before losing scope
 
 		AddAuthenticationHeader(requestMessage);
+		AddIdempotencyHeader(request as IdempotentRequestBase, requestMessage);
 		AddRequestHeaders(requestMessage, AdditionalHeaders);
 
 		if (request != null)
@@ -196,6 +197,14 @@ public sealed partial class StrikeClient
 	private void AddAuthenticationHeader(HttpRequestMessage requestMessage)
 	{
 		requestMessage.Headers.Add("Authorization", $"Bearer {ApiKey}");
+	}
+
+	private static void AddIdempotencyHeader<TRequest>(TRequest? request, HttpRequestMessage requestMessage) where TRequest : IdempotentRequestBase
+	{
+		if (request?.IdempotencyKey == null)
+			return;
+
+		requestMessage.Headers.Add("idempotency-key", request.IdempotencyKey.ToString());
 	}
 
 	private static void AddRequestHeaders(HttpRequestMessage requestMessage, Dictionary<string, string>? headers)

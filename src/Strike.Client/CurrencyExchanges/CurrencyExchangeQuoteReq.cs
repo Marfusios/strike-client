@@ -2,7 +2,7 @@
 
 namespace Strike.Client.CurrencyExchanges;
 
-public class CurrencyExchangeQuoteReq : RequestBase
+public class CurrencyExchangeQuoteReq : IdempotentRequestBase
 {
 	/// <summary>
 	/// <para>Currency code to Sell</para>

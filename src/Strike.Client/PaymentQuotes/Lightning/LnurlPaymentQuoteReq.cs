@@ -5,7 +5,7 @@ namespace Strike.Client.PaymentQuotes.Lightning;
 /// <summary>
 /// LNURL request
 /// </summary>
-public partial class LnurlPaymentQuoteReq : RequestBase
+public partial class LnurlPaymentQuoteReq : IdempotentRequestBase
 {
 	/// <summary>
 	/// <para>LN Address or LNURL to pay to</para>

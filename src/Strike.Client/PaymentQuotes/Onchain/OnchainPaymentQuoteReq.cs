@@ -1,7 +1,7 @@
 ﻿using Strike.Client.Models;
 
 namespace Strike.Client.PaymentQuotes.Onchain;
-public class OnchainPaymentQuoteReq : RequestBase
+public class OnchainPaymentQuoteReq : IdempotentRequestBase
 {
 	/// <summary>
 	/// BTC address to send funds to.

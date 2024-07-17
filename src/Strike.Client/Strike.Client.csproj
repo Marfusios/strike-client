@@ -5,7 +5,6 @@
 		<RootNamespace>Strike.Client</RootNamespace>
 
 		<TargetFrameworks>netcoreapp3.1;net6.0;net8.0</TargetFrameworks>
-		<TargetFramework>net8.0</TargetFramework>
 		<CheckEolTargetFramework>false</CheckEolTargetFramework>
 	</PropertyGroup>
 
