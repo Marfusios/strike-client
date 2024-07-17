@@ -3,7 +3,7 @@ using Strike.Client.Models;
 
 namespace Strike.Client.Invoices;
 
-[DebuggerDisplay("Quote {TargetAmount} <-- {SourceAmount} {Description} | {Result}")]
+[DebuggerDisplay("Quote {SourceAmount} --> {TargetAmount} {Description} | {Result}")]
 public record InvoiceQuote : ResponseBase
 {
 	/// <summary>

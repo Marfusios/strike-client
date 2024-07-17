@@ -30,7 +30,7 @@ public class TestsBase
 
 	protected static void AssertStatus(ResponseBase response)
 	{
-		Assert.True(response.IsSuccessStatusCode, $"Error status: {(int)response.StatusCode} {response.StatusCode}");
+		Assert.True(response.IsSuccessStatusCode, $"Error status: {(int)response.StatusCode} {response.StatusCode} ({response.Error?.Data.Code} {response.Error?.Data.Message})");
 	}
 
 	protected static bool IsApiKeySet(StrikeClient client) =>

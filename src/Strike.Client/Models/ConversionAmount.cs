@@ -3,7 +3,7 @@
 namespace Strike.Client.Models;
 
 /// <summary>
-/// Conversion details
+/// Conversion amount details
 /// </summary>
 [DebuggerDisplay("{Amount} from {SourceCurrency} to {TargetCurrency}")]
 public class ConversionAmount

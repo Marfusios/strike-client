@@ -6,13 +6,13 @@
 public enum FeePolicy
 {
 	/// <summary>
-	/// 
+	/// The fee is included in the specified amount.
 	/// </summary>
 	[EnumMember(Value = "INCLUSIVE")]
 	Inclusive,
 
 	/// <summary>
-	/// 
+	/// The fee is added on top of the specified amount.
 	/// </summary>
 	[EnumMember(Value = "EXCLUSIVE")]
 	Exclusive,

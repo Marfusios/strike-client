@@ -9,26 +9,26 @@ public class CurrencyExchangesTests : TestsBase
 	{
 		var client = GetClient();
 
-		var exchangeQuote = await client.CurrencyExchanges.PostCurrencyExchangeQuote(new CurrencyExchangeQuoteReq
+		var exchangeQuote = await client.CurrencyExchanges.CreateQuote(new CurrencyExchangeQuoteReq
 		{
 			Sell = Currency.Btc,
 			Buy = Currency.Usd,
-			Amount = new CurrencyExchangeAmount
+			Amount = new MoneyWithFee
 			{
 				Amount = 0.000001m,
 				Currency = Currency.Btc,
 				FeePolicy = FeePolicy.Exclusive
 			}
 		});
-		
+
 		AssertStatus(exchangeQuote);
 
-		var getQuote = await client.CurrencyExchanges.GetCurrencyExchangeQuote(exchangeQuote.Id);
-		
+		var getQuote = await client.CurrencyExchanges.GetQuote(exchangeQuote.Id);
+
 		AssertStatus(getQuote);
 
-		var exec = await client.CurrencyExchanges.PatchExecuteQuote(exchangeQuote.Id);
-		
+		var exec = await client.CurrencyExchanges.ExecuteQuote(exchangeQuote.Id);
+
 		AssertStatus(exec);
 	}
 

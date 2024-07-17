@@ -1,9 +1,9 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Strike.Client.Models;
 
 namespace Strike.Client.CurrencyExchanges;
 
-[DebuggerDisplay("Quote {Source} <-- {Target}")]
+[DebuggerDisplay("Quote {Source} --> {Target}")]
 public record CurrencyExchangeQuote : ResponseBase
 {
 	/// <summary>

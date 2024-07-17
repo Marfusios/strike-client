@@ -21,6 +21,6 @@ public partial class LnPaymentQuoteReq : RequestBase
 	/// <summary>
 	/// Amount to send if using zero amount invoice. Must be omitted otherwise. FeePolicy defaults to EXCLUSIVE.
 	/// </summary>
-	public Money? Amount { get; set; }
+	public MoneyWithFee? Amount { get; set; }
 
 }

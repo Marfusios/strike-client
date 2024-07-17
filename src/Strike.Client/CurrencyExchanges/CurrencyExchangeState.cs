@@ -9,7 +9,7 @@ public enum CurrencyExchangeState
 	/// The quote is new
 	/// </summary>
 	[EnumMember(Value = "NEW")]
-	NEW,
+	New,
 
 	/// <summary>
 	/// The quote is pending

@@ -246,16 +246,14 @@ public sealed partial class StrikeClient
 			{
 				var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 				// some APIs like PATCH /v1/currency-exchange-quotes/ return empty response
-				if (String.IsNullOrWhiteSpace(json))
+				if (string.IsNullOrWhiteSpace(json))
 					json = "{}";
-				
+
 				var result = JsonSerializer.Deserialize<TResponse>(json, options: JsonSerializerOptions);
 				result!.StatusCode = response.StatusCode;
 
 				if (IncludeRawJson)
-				{
-					result!.RawJson = json;
-				}
+					result.RawJson = json;
 
 				return result;
 

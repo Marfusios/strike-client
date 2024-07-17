@@ -73,7 +73,7 @@ public class PaymentTests : TestsBase
 		var client = GetClient();
 
 		var btcAddress = "tb1qggmknym2lw23e9vhjlqtddr3dkzkrz7860v3nc";
-		var targetAmount = new Money { Amount = 10m, Currency = Currency.Usd };
+		var targetAmount = new MoneyWithFee { Amount = 10m, Currency = Currency.Usd, FeePolicy = FeePolicy.Exclusive };
 
 		var tiers = await client.PaymentQuotes.GetOnchainTiers(new OnchainTiersReq
 		{

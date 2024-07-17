@@ -24,7 +24,7 @@ public class OnchainPaymentQuoteReq : RequestBase
 	/// <summary>
 	/// Amount to send. FeePolicy defaults to EXCLUSIVE.
 	/// </summary>
-	public required Money Amount { get; init; }
+	public required MoneyWithFee Amount { get; init; }
 
 	/// <summary>
 	/// Id of the tier retrieved from `/payment-quotes/onchain/tiers`.

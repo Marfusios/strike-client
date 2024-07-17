@@ -1,3 +1,3 @@
-namespace Strike.Client.CurrencyExchanges;
+﻿namespace Strike.Client.CurrencyExchanges;
 
-public record class CurrencyExchangeExecute : ResponseBase;
+public record CurrencyExchangeExecute : ResponseBase;
