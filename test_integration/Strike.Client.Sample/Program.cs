@@ -12,6 +12,7 @@ using Strike.Client;
 using Strike.Client.Invoices;
 using Strike.Client.Models;
 using Strike.Client.PaymentQuotes.Lightning;
+using Strike.Client.ReceiveRequests.Requests;
 
 using var logFactory = InitLogging();
 
@@ -44,6 +45,26 @@ var invoiceQuote = await client.Invoices.IssueQuote(invoice.InvoiceId);
 var foundQuote = await client.Invoices.FindQuote(invoiceQuote.QuoteId);
 
 var allInvoices = await client.Invoices.GetInvoices();
+
+var receiveRequest = await client.ReceiveRequests.Create(new ReceiveRequestReq
+{
+	TargetCurrency = Currency.Eur,
+	Bolt11 = new Bolt11ReceiveRequestReq
+	{
+		Amount = new Money { Amount = 1m, Currency = Currency.Eur },
+		Description = "Receive request from Strike .NET client",
+		ExpiryInSeconds = 60 * 10
+	},
+	Onchain = new OnchainReceiveRequestReq
+	{
+		Amount = new Money { Amount = 1000m, Currency = Currency.Eur }
+	},
+	//Bolt12 = new Bolt12ReceiveRequestReq()
+});
+
+var foundRequest = await client.ReceiveRequests.FindRequest(receiveRequest.ReceiveRequestId);
+var allRequests = await client.ReceiveRequests.GetRequests();
+var receives = await client.ReceiveRequests.GetReceives(receiveRequest.ReceiveRequestId);
 
 var profile = await client.Accounts.GetProfile("marfusios");
 Log.Information($"Profile: {profile.Handle} and description: {profile.Description}");

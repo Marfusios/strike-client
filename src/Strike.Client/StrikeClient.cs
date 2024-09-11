@@ -218,6 +218,13 @@ public sealed partial class StrikeClient
 		}
 	}
 
+	private static string ConstructUrlParams(params (string Key, object? Value)[] parameters)
+	{
+		var nonEmptyParams = parameters.Where(p => p.Value != null);
+		var urlPart = string.Join("&", nonEmptyParams.Select(p => $"${p.Key}={p.Value}"));
+		return urlPart.Length > 0 ? $"?{urlPart}" : string.Empty;
+	}
+
 	private readonly struct ResponseParser
 	{
 		public HttpRequestMessage Request { get; init; }
