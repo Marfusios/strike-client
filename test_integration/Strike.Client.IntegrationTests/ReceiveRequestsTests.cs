@@ -37,14 +37,14 @@ public class ReceiveRequestsTests : TestsBase
 		AssertStatus(allRequests);
 		Assert.NotEmpty(allRequests.Items);
 
-		var requestByInvoice = await client.ReceiveRequests.GetRequests(bolt11Invoice: bolt11?.Invoice);
+		var requestByInvoice = await client.ReceiveRequests.GetRequests(bolt11Invoice: [bolt11?.Invoice]);
 		AssertStatus(requestByInvoice);
 		Assert.NotNull(requestByInvoice);
 		var requestByInvoiceItem = Assert.Single(requestByInvoice.Items);
 		Assert.Equal(bolt11?.PaymentHash, requestByInvoiceItem.Bolt11?.PaymentHash);
 		AssertReceiveRequest(requestByInvoiceItem);
 
-		var requestByPaymentHash = await client.ReceiveRequests.GetRequests(paymentHash: bolt11?.PaymentHash);
+		var requestByPaymentHash = await client.ReceiveRequests.GetRequests(paymentHash: [bolt11?.PaymentHash]);
 		AssertStatus(requestByPaymentHash);
 		Assert.NotNull(requestByPaymentHash);
 		var requestByPaymentHashItem = Assert.Single(requestByPaymentHash.Items);

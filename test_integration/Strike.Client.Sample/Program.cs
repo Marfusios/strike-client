@@ -33,18 +33,18 @@ var client = new StrikeClient(options, null, logger)
 	ShowRawJson = true
 };
 
-var invoice = await client.Invoices.IssueInvoice(new InvoiceReq
-{
-	Amount = new Money { Amount = 2m, Currency = Currency.Eur },
-	Description = "Invoice from Strike .NET client"
-});
-Log.Information($"Invoice: {invoice.InvoiceId} with amount: {invoice.Amount.Amount} {invoice.Amount.Currency}");
+//var invoice = await client.Invoices.IssueInvoice(new InvoiceReq
+//{
+//	Amount = new Money { Amount = 2m, Currency = Currency.Eur },
+//	Description = "Invoice from Strike .NET client"
+//});
+//Log.Information($"Invoice: {invoice.InvoiceId} with amount: {invoice.Amount.Amount} {invoice.Amount.Currency}");
 
-var invoiceQuote = await client.Invoices.IssueQuote(invoice.InvoiceId);
+//var invoiceQuote = await client.Invoices.IssueQuote(invoice.InvoiceId);
 
-var foundQuote = await client.Invoices.FindQuote(invoiceQuote.QuoteId);
+//var foundQuote = await client.Invoices.FindQuote(invoiceQuote.QuoteId);
 
-var allInvoices = await client.Invoices.GetInvoices();
+//var allInvoices = await client.Invoices.GetInvoices();
 
 var receiveRequest = await client.ReceiveRequests.Create(new ReceiveRequestReq
 {
@@ -65,6 +65,7 @@ var receiveRequest = await client.ReceiveRequests.Create(new ReceiveRequestReq
 var foundRequest = await client.ReceiveRequests.FindRequest(receiveRequest.ReceiveRequestId);
 var allRequests = await client.ReceiveRequests.GetRequests();
 var receives = await client.ReceiveRequests.GetReceives(receiveRequest.ReceiveRequestId);
+var receivesByFilter = await client.ReceiveRequests.GetReceives(paymentHash: [receiveRequest.Bolt11?.PaymentHash, receiveRequest.Bolt11?.PaymentHash, "invalid_payment_hash"]);
 
 var profile = await client.Accounts.GetProfile("marfusios");
 Log.Information($"Profile: {profile.Handle} and description: {profile.Description}");

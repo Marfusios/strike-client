@@ -221,8 +221,22 @@ public sealed partial class StrikeClient
 	private static string ConstructUrlParams(params (string Key, object? Value)[] parameters)
 	{
 		var nonEmptyParams = parameters.Where(p => p.Value != null);
-		var urlPart = string.Join("&", nonEmptyParams.Select(p => $"${p.Key}={p.Value}"));
+		var urlPart = string.Join("&", nonEmptyParams.Select(p => $"${p.Key}={ConstructUrlValue(p.Value)}"));
 		return urlPart.Length > 0 ? $"?{urlPart}" : string.Empty;
+	}
+
+	private static string ConstructUrlValue(object? value)
+	{
+		if (value == null)
+			return string.Empty;
+		if (value is string str)
+			return str;
+		if (value is IEnumerable<object?> items)
+		{
+			return string.Join(",", items.Where(x => x != null));
+		}
+
+		return value.ToString() ?? string.Empty;
 	}
 
 	private readonly struct ResponseParser

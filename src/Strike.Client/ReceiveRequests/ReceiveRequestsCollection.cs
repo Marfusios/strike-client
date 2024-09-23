@@ -1,4 +1,8 @@
-﻿namespace Strike.Client.ReceiveRequests;
+﻿using System.Diagnostics;
+
+namespace Strike.Client.ReceiveRequests;
+
+[DebuggerDisplay("ReceiveRequests {Count}")]
 public record ReceiveRequestsCollection : ResponseBase
 {
 	/// <summary>
