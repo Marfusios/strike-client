@@ -60,7 +60,8 @@ public sealed partial class StrikeClient
 			string?[]? bolt11Invoice = null,
 			string?[]? onchainAddress = null,
 			string?[]? paymentHash = null,
-			Guid[]? receiveId = null
+			Guid[]? receiveId = null,
+			Guid[]? receiveRequestId = null
 		)
 		{
 			var urlParams = ConstructUrlParams(
@@ -69,7 +70,8 @@ public sealed partial class StrikeClient
 				(nameof(bolt11Invoice), bolt11Invoice),
 				(nameof(onchainAddress), onchainAddress),
 				(nameof(paymentHash), paymentHash),
-				(nameof(receiveId), receiveId)
+				(nameof(receiveId), receiveId),
+				(nameof(receiveRequestId), receiveRequestId)
 			);
 			return Client.Get($"/v1/receive-requests/receives{urlParams}")
 				.ParseResponse<ReceivesCollection>();

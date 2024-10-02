@@ -66,6 +66,7 @@ var foundRequest = await client.ReceiveRequests.FindRequest(receiveRequest.Recei
 var allRequests = await client.ReceiveRequests.GetRequests();
 var receives = await client.ReceiveRequests.GetReceives(receiveRequest.ReceiveRequestId);
 var receivesByFilter = await client.ReceiveRequests.GetReceives(paymentHash: [receiveRequest.Bolt11?.PaymentHash, receiveRequest.Bolt11?.PaymentHash, "invalid_payment_hash"]);
+var receivesByParent = await client.ReceiveRequests.GetReceives(receiveRequestId: [receiveRequest.ReceiveRequestId]);
 
 var profile = await client.Accounts.GetProfile("marfusios");
 Log.Information($"Profile: {profile.Handle} and description: {profile.Description}");

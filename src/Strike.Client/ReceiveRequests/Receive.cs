@@ -12,6 +12,11 @@ public record Receive
 	public Guid ReceiveId { get; init; }
 
 	/// <summary>
+	/// ID of the parent receive request.
+	/// </summary>
+	public Guid ReceiveRequestId { get; init; }
+
+	/// <summary>
 	/// Type of the receive.
 	/// </summary>
 	public ReceiveType Type { get; init; }

@@ -235,6 +235,10 @@ public sealed partial class StrikeClient
 		{
 			return string.Join(",", items.Where(x => x != null));
 		}
+		if (value is IEnumerable<Guid> guids)
+		{
+			return string.Join(",", guids);
+		}
 
 		return value.ToString() ?? string.Empty;
 	}
