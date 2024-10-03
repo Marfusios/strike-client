@@ -267,6 +267,33 @@ public sealed partial class StrikeClient
 					result);
 				return result;
 			}
+			catch (Exception ex)
+			{
+				if (ThrowOnError)
+					throw;
+
+				var status = HttpStatusCode.ServiceUnavailable;
+
+#if NET6_0_OR_GREATER
+				var httpException = ex as HttpRequestException;
+				status = httpException?.StatusCode ?? HttpStatusCode.ServiceUnavailable;
+#endif
+
+				var errorResponse = new TResponse
+				{
+					Error = new StrikeError
+					{
+						Data = new StrikeApiError
+						{
+							Status = (int)status,
+							Code = "API_UNAVAILABLE",
+							Message = ex.Message
+						}
+					},
+					StatusCode = status
+				};
+				return errorResponse;
+			}
 			finally
 			{
 				Request.Dispose();
