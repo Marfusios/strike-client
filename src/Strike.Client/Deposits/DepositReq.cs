@@ -14,7 +14,7 @@ public class DepositReq : RequestBase
 	/// <summary>
 	/// Amount to deposit. Currency is defined by the payment method.
 	/// </summary>
-	public required Money Amount { get; init; }
+	public required string Amount { get; init; }
 
 	/// <summary>
 	/// Should the fee be included in the amount or added on top of it. Defaults to EXCLUSIVE.
