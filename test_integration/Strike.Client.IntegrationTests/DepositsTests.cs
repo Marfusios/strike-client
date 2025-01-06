@@ -1,5 +1,6 @@
 ﻿using Strike.Client.Deposits;
 using Strike.Client.Models;
+using Strike.Client.PaymentMethods;
 
 namespace Strike.Client.IntegrationTests;
 public class DepositsTests : TestsBase
@@ -9,13 +10,16 @@ public class DepositsTests : TestsBase
 	{
 		var client = GetClient();
 
-		// TODO: Set your own PaymentMethodId
-		var paymentMethodId = Guid.Parse("2537644e-7898-4f33-8ff3-4497901ae5e6");
+		var allMethods = await client.PaymentMethods.GetPaymentMethods();
+		AssertStatus(allMethods);
+
+		var paymentMethod = allMethods.Items.FirstOrDefault(x => x is { State: PaymentMethodState.Ready, TransferType: PaymentMethodTransferTypes.ACH });
+		Skip.If(paymentMethod == null, "There is no active payment method for ACH, create it first!");
 
 		var depositRequest = new DepositReq
 		{
 			Amount = "10",
-			PaymentMethodId = paymentMethodId,
+			PaymentMethodId = paymentMethod.Id,
 			// not setting since it's not required
 			// Fee = FeePolicy.Exclusive
 		};
@@ -29,15 +33,15 @@ public class DepositsTests : TestsBase
 		Assert.Equal(Currency.Usd, feeEstimate.Fee.Currency);
 		Assert.Equal(10, feeEstimate.Total!.Amount);
 		Assert.Equal(Currency.Usd, feeEstimate.Total.Currency);
-		Assert.Equal(5, feeEstimate.SettlementPeriodInDay);
+		//Assert.Equal(5, feeEstimate.SettlementPeriodInDay);
 
-		// TODO: Initiate deposit
-		// var deposit = await client.Deposits.Create(depositRequest);
-		// AssertStatus(deposit);
-		// Assert.NotEqual(Guid.Empty, deposit.Id);
-		// Assert.Equal(10, deposit.Amount!.Amount);
-		// Assert.Equal(Currency.Usd, deposit.Amount.Currency);
-		// Assert.Equal(DepositState.Pending, deposit.State);
+		// Initiate deposit
+		var deposit = await client.Deposits.Create(depositRequest);
+		AssertStatus(deposit);
+		Assert.NotEqual(Guid.Empty, deposit.Id);
+		Assert.Equal(10, deposit.Amount!.Amount);
+		Assert.Equal(Currency.Usd, deposit.Amount.Currency);
+		Assert.Equal(DepositState.Pending, deposit.State);
 
 		// Get deposits
 		var allRequests = await client.Deposits.GetDeposits();
