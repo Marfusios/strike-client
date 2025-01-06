@@ -24,7 +24,7 @@ public sealed partial class StrikeClient
 		/// <summary>
 		/// Get all payment methods
 		/// </summary>
-		public Task<ResponseCollection<PaymentMethod>> GetRequests(
+		public Task<PaymentMethodsCollection> GetPaymentMethods(
 			int top = 100,
 			int skip = 0,
 			string? supportedAction = null
@@ -36,7 +36,7 @@ public sealed partial class StrikeClient
 				(nameof(supportedAction), supportedAction)
 			);
 			return Client.Get($"/v1/payment-methods/bank{urlParams}")
-				.ParseResponse<ResponseCollection<PaymentMethod>>();
+				.ParseResponse<PaymentMethodsCollection>();
 		}
 		
 		
@@ -44,14 +44,14 @@ public sealed partial class StrikeClient
 		/// Find payment method by id 
 		/// </summary>
 		public Task<PaymentMethod> FindPaymentMethod(Guid id) =>
-			Client.Get($"/v1/payments/bank/{id}")
+			Client.Get($"/v1/payment-methods/bank/{id}")
 				.ParseResponse<PaymentMethod>();
 
 		/// <summary>
 		/// Delete payment method by id 
 		/// </summary>
 		public Task<PaymentMethod> DeletePaymentMethod(Guid id) =>
-			Client.Delete($"/v1/payments/bank/{id}")
+			Client.Delete($"/v1/payment-methods/bank/{id}")
 				.ParseResponse<PaymentMethod>();
 	}
 }

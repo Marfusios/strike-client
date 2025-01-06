@@ -3,7 +3,7 @@ using Strike.Client.Models;
 
 namespace Strike.Client.PaymentMethods;
 
-[DebuggerDisplay("Payment Method Request {TotalAmount} --> {Amount} | {State}")]
+[DebuggerDisplay("Payment Method {TransferType} {Id} | {State}")]
 public record PaymentMethod : ResponseBase
 {
 	/// <summary>
