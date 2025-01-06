@@ -9,12 +9,12 @@ public class DepositReq : RequestBase
 	/// <summary>
 	/// Payment method to deposit.
 	/// </summary>
-	public Guid PaymentMethodId { get; init; }
+	public required Guid PaymentMethodId { get; init; }
 
 	/// <summary>
 	/// Amount to deposit. Currency is defined by the payment method.
 	/// </summary>
-	public Money? Amount { get; init; }
+	public required Money Amount { get; init; }
 
 	/// <summary>
 	/// Should the fee be included in the amount or added on top of it. Defaults to EXCLUSIVE.
