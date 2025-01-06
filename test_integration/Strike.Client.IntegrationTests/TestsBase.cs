@@ -30,7 +30,15 @@ public class TestsBase
 
 	protected static void AssertStatus(ResponseBase response)
 	{
-		Assert.True(response.IsSuccessStatusCode, $"Error status: {(int)response.StatusCode} {response.StatusCode} ({response.Error?.Data.Code} {response.Error?.Data.Message})");
+		var msg =
+			$"Error status: {(int)response.StatusCode} {response.StatusCode} ({response.Error?.Data.Code} {response.Error?.Data.Message})";
+		if (response.Error?.Data.ValidationErrors?.Any() == true)
+		{
+			var props = response.Error.Data.ValidationErrors.Select(x =>
+				$"{x.Key}: {string.Join(", ", x.Value.Select(y => $"{y.Code} - {y.Message}"))}");
+			msg += " Validations: " + string.Join("; ", props);
+		}
+		Assert.True(response.IsSuccessStatusCode, msg);
 	}
 
 	protected static bool IsApiKeySet(StrikeClient client) =>
