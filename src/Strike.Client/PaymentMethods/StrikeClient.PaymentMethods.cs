@@ -20,7 +20,7 @@ public sealed partial class StrikeClient
 		public Task<PaymentMethod> Create(PaymentMethodReq request) =>
 			Client.Post($"/v1/payment-methods/bank", request)
 				.ParseResponse<PaymentMethod>();
-		
+
 		/// <summary>
 		/// Get all payment methods
 		/// </summary>
@@ -38,8 +38,7 @@ public sealed partial class StrikeClient
 			return Client.Get($"/v1/payment-methods/bank{urlParams}")
 				.ParseResponse<PaymentMethodsCollection>();
 		}
-		
-		
+
 		/// <summary>
 		/// Find payment method by id 
 		/// </summary>

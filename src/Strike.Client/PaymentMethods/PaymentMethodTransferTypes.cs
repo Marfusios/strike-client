@@ -10,19 +10,19 @@ public enum PaymentMethodTransferTypes
 	/// </summary>
 	[EnumMember(Value = "ACH")]
 	ACH,
-	
+
 	/// <summary>
 	/// US_DOMESTIC_WIRE
 	/// </summary>
 	[EnumMember(Value = "US_DOMESTIC_WIRE")]
 	US_DOMESTIC_WIRE,
-	
+
 	/// <summary>
 	/// SEPA
 	/// </summary>
 	[EnumMember(Value = "SEPA")]
 	SEPA,
-	
+
 	/// <summary>
 	/// FPS
 	/// </summary>

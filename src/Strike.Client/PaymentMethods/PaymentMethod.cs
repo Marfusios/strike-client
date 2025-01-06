@@ -18,7 +18,7 @@ public record PaymentMethod : ResponseBase
 	/// State of the payment method
 	/// </summary>
 	public PaymentMethodState State { get; init; }
-	
+
 	/// <summary>
 	/// State of the payment method
 	/// </summary>

@@ -74,7 +74,7 @@ public class PaymentTests : TestsBase
 		var client = GetClient();
 
 		var btcAddress = "tb1qggmknym2lw23e9vhjlqtddr3dkzkrz7860v3nc";
-		var targetAmount = new MoneyWithFee { Amount = 10m, Currency = Currency.Usd, FeePolicy = FeePolicy.Exclusive };
+		var targetAmount = new MoneyWithFee { Amount = 200m, Currency = Currency.Usd, FeePolicy = FeePolicy.Exclusive };
 
 		var tiers = await client.PaymentQuotes.GetOnchainTiers(new OnchainTiersReq
 		{
@@ -95,7 +95,7 @@ public class PaymentTests : TestsBase
 			OnchainTierId = selectedTier
 		});
 		AssertStatus(quote);
-		Assert.True(quote.TotalAmount.Amount < 20m);
+		Assert.True(quote.TotalAmount.Amount <= targetAmount.Amount);
 
 		var payment = await client.PaymentQuotes.ExecuteQuote(quote.PaymentQuoteId);
 		AssertStatus(payment);

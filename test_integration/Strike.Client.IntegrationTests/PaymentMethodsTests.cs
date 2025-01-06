@@ -1,8 +1,8 @@
 ﻿using Strike.Client.Models;
-using Strike.Client.ReceiveRequests;
-using Strike.Client.ReceiveRequests.Requests;
+using Strike.Client.PaymentMethods;
 
 namespace Strike.Client.IntegrationTests;
+
 public class PaymentMethodsTests : TestsBase
 {
 	[SkippableFact]
@@ -10,17 +10,36 @@ public class PaymentMethodsTests : TestsBase
 	{
 		var client = GetClient();
 
-		// TODO: Add creation of a payment method
-		
+		// Create payment method
+		var request = new PaymentMethodReq
+		{
+			AccountNumber = "1111222233334444",
+			RoutingNumber = "071004200",
+			TransferType = PaymentMethodTransferTypes.ACH,
+			Beneficiaries = [
+				new Beneficiary
+				{
+					Name = "Test User",
+					Type = BeneficiaryType.Individual
+				}
+			]
+		};
+		var created = await client.PaymentMethods.Create(request);
+		AssertStatus(created);
+
 		// Get all payment methods
 		var allRequests = await client.PaymentMethods.GetPaymentMethods();
 		AssertStatus(allRequests);
 		Assert.NotEmpty(allRequests.Items);
 
-		var first = allRequests.Items.First();
-		var foundRequest = await client.PaymentMethods.FindPaymentMethod(first.Id);
+		var found = allRequests.Items.FirstOrDefault(x => x.Id == created.Id);
+		Assert.NotNull(found);
+
+		var foundRequest = await client.PaymentMethods.FindPaymentMethod(found.Id);
 		AssertStatus(foundRequest);
 
-		// TODO: Delete payment method
+		// Delete payment method
+		var deleted = await client.PaymentMethods.DeletePaymentMethod(foundRequest.Id);
+		AssertStatus(deleted);
 	}
 }

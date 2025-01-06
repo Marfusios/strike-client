@@ -24,19 +24,19 @@ public record Beneficiary
 	/// Address
 	/// </summary>
 	public Address? Address { get; init; }
-	
+
 	// company specific fields
-	
+
 	/// <summary>
 	/// Email
 	/// </summary>
 	public string? Email { get; init; }
-	
+
 	/// <summary>
 	/// Phone Number
 	/// </summary>
 	public string? PhoneNumber { get; init; }
-	
+
 	/// <summary>
 	/// Phone Number
 	/// </summary>
