@@ -148,6 +148,11 @@ public sealed partial class StrikeClient
 		return Send<RequestBase>(path, HttpMethod.Patch, null);
 	}
 
+	private ResponseParser Delete(string path)
+	{
+		return Send<RequestBase>(path, HttpMethod.Delete, null);
+	}
+
 	private ResponseParser Patch<TRequest>(string path, TRequest? request) where TRequest : RequestBase
 	{
 		return Send(path, HttpMethod.Patch, request);
