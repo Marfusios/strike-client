@@ -4,7 +4,7 @@ using Strike.Client.Models;
 namespace Strike.Client.Deposits;
 
 [DebuggerDisplay("Deposit Request {PaymentMethodId} --> {Amount} | {Fee}")]
-public class DepositReq : RequestBase
+public class DepositReq : IdempotentRequestBase
 {
 	/// <summary>
 	/// Payment method to deposit.
