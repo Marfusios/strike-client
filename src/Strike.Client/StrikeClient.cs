@@ -1,4 +1,6 @@
-﻿using Strike.Client.Converters;
+﻿using System.Diagnostics;
+using System.Reflection;
+using Strike.Client.Converters;
 
 namespace Strike.Client;
 
@@ -181,6 +183,7 @@ public sealed partial class StrikeClient
 		};
 #pragma warning restore CA2000 // Dispose objects before losing scope
 
+		AddUserAgentHeader(requestMessage);
 		AddAuthenticationHeader(requestMessage);
 		AddIdempotencyHeader(request as IdempotentRequestBase, requestMessage);
 		AddRequestHeaders(requestMessage, AdditionalHeaders);
@@ -197,6 +200,13 @@ public sealed partial class StrikeClient
 			Logger = _logger,
 			ThrowOnError = ThrowOnError
 		};
+	}
+
+	private static void AddUserAgentHeader(HttpRequestMessage requestMessage)
+	{
+		var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.0.1";
+		var dotnetVersion = System.Environment.Version.ToString(2);
+		requestMessage.Headers.Add("User-Agent", $"StrikeClient/{version} dotnet/{dotnetVersion}");
 	}
 
 	private void AddAuthenticationHeader(HttpRequestMessage requestMessage)

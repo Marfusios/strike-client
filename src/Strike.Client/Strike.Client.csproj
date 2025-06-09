@@ -7,7 +7,7 @@
 		<CheckEolTargetFramework>false</CheckEolTargetFramework>
 	</PropertyGroup>
 
-	<PropertyGroup Condition=" '$(Configuration)' == 'Debug'">
+	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
 		<TargetFramework>net8.0</TargetFramework>
 	</PropertyGroup>
 
@@ -18,7 +18,7 @@
 
 		<Authors>marfusios; Mariusz Kotas</Authors>
 		<PackageTags>bitcoin lightning payments api</PackageTags>
-		<Copyright>Copyright 2024 Mariusz Kotas</Copyright>
+		<Copyright>Copyright 2025 Mariusz Kotas</Copyright>
 
 		<PackageIcon>strike_white.png</PackageIcon>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -34,7 +34,7 @@
 
 	<PropertyGroup>
 		<Copyright>
-			Copyright © 2024 Mariusz Kotas
+			Copyright © 2025 Mariusz Kotas
 		</Copyright>
 	</PropertyGroup>
 
