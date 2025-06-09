@@ -85,7 +85,7 @@ public class PaymentTests : TestsBase
 		AssertStatus(tiers);
 		Assert.NotEmpty(tiers);
 
-		var selectedTier = tiers.Skip(1).First().Id;
+		var selectedTier = tiers.FirstOrDefault(x => x.EstimatedFee.Amount <= 0)?.Id ?? tiers.Last().Id;
 
 		var quote = await client.PaymentQuotes.CreateOnchainQuote(new OnchainPaymentQuoteReq
 		{
