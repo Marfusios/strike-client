@@ -1,5 +1,8 @@
 ![Logo](https://raw.githubusercontent.com/Marfusios/strike-client/master/strike_wide.png)
-# Strike .NET client [![NuGet version](https://badge.fury.io/nu/StrikeWallet.Client.svg)](https://www.nuget.org/packages/StrikeWallet.Client) [![Nuget downloads](https://img.shields.io/nuget/dt/StrikeWallet.Client)](https://www.nuget.org/packages/StrikeWallet.Client)
+# Strike .NET client 
+[![NuGet version](https://img.shields.io/nuget/v/StrikeWallet.Client?style=flat-square)](https://www.nuget.org/packages/StrikeWallet.Client)
+[![Nuget downloads](https://img.shields.io/nuget/dt/StrikeWallet.Client?style=flat-square)](https://www.nuget.org/packages/StrikeWallet.Client)
+[![CI build](https://img.shields.io/github/check-runs/marfusios/strike-client/master?style=flat-square&label=build)](https://github.com/Marfusios/strike-client/actions/workflows/dotnet-core.yml)
 
 This is a C# implementation of the Strike API found here:
 
