@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Strike.Client.Testing;
 
 namespace Strike.Client.IntegrationTests;
 
@@ -16,13 +17,17 @@ public class TestsBase
 			.AddUserSecrets(Assembly.GetExecutingAssembly(), optional: true)
 			.Build();
 
-		Provider = new ServiceCollection()
-			.AddStrike(config)
-			.BuildServiceProvider();
+		var services = new ServiceCollection().AddStrike(config);
+		_ = services.AddHttpClient(StrikeOptions.HttpClientName)
+			.AddHttpMessageHandler(() => new ReadOnlyHttpMessageHandler());
+		Provider = services.BuildServiceProvider();
 	}
 
-	protected StrikeClient GetClient()
+	protected StrikeClient GetClient(bool readOnly = false)
 	{
+		// Only reviewed read-only tests may access configured account credentials.
+		// The HTTP handler also blocks writes if a read-only test changes later.
+		Skip.IfNot(readOnly, "Disabled: integration credentials are restricted to reviewed read-only tests.");
 		var client = Provider.GetRequiredService<StrikeClient>();
 		Skip.IfNot(IsApiKeySet(client), "ApiKey is not set, skip tests");
 		return client;

@@ -1,6 +1,7 @@
 ﻿using Strike.Client.Models;
 
 namespace Strike.Client.PaymentQuotes;
+
 public record PaymentQuote : ResponseBase
 {
 	/// <summary>

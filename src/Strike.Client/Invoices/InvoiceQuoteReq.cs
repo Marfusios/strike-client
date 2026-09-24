@@ -1,4 +1,5 @@
 ﻿namespace Strike.Client.Invoices;
+
 public class InvoiceQuoteReq : RequestBase
 {
 	/// <summary>

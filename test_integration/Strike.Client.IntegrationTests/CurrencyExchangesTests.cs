@@ -2,6 +2,7 @@
 using Strike.Client.Models;
 
 namespace Strike.Client.IntegrationTests;
+
 public class CurrencyExchangesTests : TestsBase
 {
 	[SkippableFact]

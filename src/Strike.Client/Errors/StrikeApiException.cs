@@ -1,4 +1,4 @@
-namespace Strike.Client.Errors;
+﻿namespace Strike.Client.Errors;
 
 public class StrikeApiException : Exception
 {

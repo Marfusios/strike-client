@@ -1,4 +1,5 @@
 ﻿namespace Strike.Client.ReceiveRequests;
+
 public enum ReceiveType
 {
 	[EnumMember(Value = "LIGHTNING")]

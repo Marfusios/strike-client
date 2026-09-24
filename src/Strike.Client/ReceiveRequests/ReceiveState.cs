@@ -1,4 +1,5 @@
 ﻿namespace Strike.Client.ReceiveRequests;
+
 public enum ReceiveState
 {
 	[EnumMember(Value = "PENDING")]

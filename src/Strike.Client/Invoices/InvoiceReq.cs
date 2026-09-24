@@ -1,6 +1,7 @@
 ﻿using Strike.Client.Models;
 
 namespace Strike.Client.Invoices;
+
 public class InvoiceReq : RequestBase
 {
 	/// <summary>

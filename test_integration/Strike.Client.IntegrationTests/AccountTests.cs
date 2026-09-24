@@ -1,4 +1,5 @@
 ﻿namespace Strike.Client.IntegrationTests;
+
 public class AccountTests : TestsBase
 {
 	[SkippableFact]
@@ -17,11 +18,14 @@ public class AccountTests : TestsBase
 	[SkippableFact]
 	public async Task GetBalances_ShouldWork()
 	{
-		var client = GetClient();
+		var client = GetClient(readOnly: true);
+		client.ShowRawJson = true;
 
 		var balances = await client.Balances.GetBalances();
+		var balances2 = await client.Balances.GetBalances();
 
 		AssertStatus(balances);
+		AssertStatus(balances2);
 		Assert.NotEmpty(balances);
 	}
 }

@@ -26,6 +26,6 @@ public partial class LnurlPaymentQuoteReq : IdempotentRequestBase
 	/// <para>Payment description. Can be set only if the LNURL service allows comment</para>
 	/// <para>Max length of the description is defined by the commentAllowed property of the GET LNURL details endpoint response.</para>
 	/// </summary>
-	public string? Description { get; set; } = default!;
+	public string? Description { get; set; }
 
 }

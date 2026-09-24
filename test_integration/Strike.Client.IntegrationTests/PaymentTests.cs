@@ -6,6 +6,7 @@ using Strike.Client.PaymentQuotes.Onchain;
 using Strike.Client.Payments;
 
 namespace Strike.Client.IntegrationTests;
+
 public class PaymentTests : TestsBase
 {
 	[SkippableFact]

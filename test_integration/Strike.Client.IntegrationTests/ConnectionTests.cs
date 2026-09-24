@@ -1,4 +1,5 @@
 ﻿namespace Strike.Client.IntegrationTests;
+
 public class ConnectionTests : TestsBase
 {
 	[SkippableFact]

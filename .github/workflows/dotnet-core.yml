@@ -15,22 +15,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+    - uses: actions/checkout@v7
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v6
       with:
-        dotnet-version: 8.x
+        dotnet-version: |
+          8.0.x
+          10.0.x
 
     - name: Install dependencies
       run: dotnet restore
     - name: Build
       run: dotnet build --configuration Release --no-restore
-    - name: Test
-      run: dotnet test --no-restore --logger "trx;LogFileName=tests.trx"
+    - name: Unit tests
+      run: dotnet test test/Strike.Client.Tests/Strike.Client.Tests.csproj --configuration Release --no-build --logger "trx;LogFilePrefix=tests"
+    - name: Read-only integration tests
+      run: dotnet test test_integration/Strike.Client.IntegrationTests/Strike.Client.IntegrationTests.csproj --configuration Release --no-build --filter "FullyQualifiedName~GetBalances_ShouldWork|FullyQualifiedName~GetRates_ShouldWork|FullyQualifiedName~InvalidUrl_ShouldNotThrowException" --logger "trx;LogFilePrefix=tests"
       env:
           Strike__ApiKey: ${{secrets.STRIKE_API_KEY}}
     - name: Test Report
-      uses: dorny/test-reporter@v1
+      uses: dorny/test-reporter@v3
       if: success() || failure()    # run this step even if previous step failed
       with:
         name: tests

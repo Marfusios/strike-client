@@ -1,4 +1,5 @@
 ﻿namespace Strike.Client.Invoices;
+
 public record InvoicesCollection : ResponseBase
 {
 	/// <summary>

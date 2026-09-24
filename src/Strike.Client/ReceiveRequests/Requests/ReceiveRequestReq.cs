@@ -1,6 +1,7 @@
 ﻿using Strike.Client.Models;
 
 namespace Strike.Client.ReceiveRequests.Requests;
+
 public class ReceiveRequestReq : RequestBase
 {
 	/// <summary>

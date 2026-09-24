@@ -3,6 +3,7 @@ using Strike.Client.Models;
 using Strike.Client.PaymentMethods;
 
 namespace Strike.Client.IntegrationTests;
+
 public class DepositsTests : TestsBase
 {
 	[SkippableFact]

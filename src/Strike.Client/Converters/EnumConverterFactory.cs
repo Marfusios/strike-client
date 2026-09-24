@@ -92,11 +92,11 @@ public sealed class EnumConverterFactory : JsonConverterFactory
 
 		private static string GetEnumValue(T value)
 		{
-			var memInfo = value.GetType().GetMember(value.ToString()!);
+			var memInfo = value.GetType().GetMember(value.ToString());
 			var attr = memInfo[0].GetCustomAttribute<EnumMemberAttribute>();
 #pragma warning disable CA1308 // Normalize strings to uppercase
 			// normalization is lowercase per Strike docs
-			var name = attr?.Value ?? value.ToString()!.ToLowerInvariant();
+			var name = attr?.Value ?? value.ToString().ToLowerInvariant();
 #pragma warning restore CA1308 // Normalize strings to uppercase
 			return name;
 		}

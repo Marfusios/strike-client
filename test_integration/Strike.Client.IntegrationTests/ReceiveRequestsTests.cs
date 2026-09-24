@@ -3,6 +3,7 @@ using Strike.Client.ReceiveRequests;
 using Strike.Client.ReceiveRequests.Requests;
 
 namespace Strike.Client.IntegrationTests;
+
 public class ReceiveRequestsTests : TestsBase
 {
 	[SkippableFact]

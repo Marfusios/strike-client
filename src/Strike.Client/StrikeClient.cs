@@ -61,7 +61,7 @@ public sealed partial class StrikeClient
 			var collection = new ServiceCollection();
 			_ = collection.AddStrikeHttpClient();
 			var serviceProvider = collection.BuildServiceProvider();
-			_clientFactory = serviceProvider.GetService<IHttpClientFactory>()!;
+			_clientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
 		}
 		else
 			_clientFactory = httpClientFactory;
@@ -170,8 +170,11 @@ public sealed partial class StrikeClient
 		var client = _clientFactory.CreateClient(StrikeOptions.HttpClientName);
 		var baseUrl = _serverUrl;
 		var url = new Uri(baseUrl, path);
-		_logger.LogTrace("Initiating request. Method: {Method}; Url: {Url}; Content: {@Content}",
-			method.Method.ToUpperInvariant(), url, request);
+		if (_logger.IsEnabled(LogLevel.Trace))
+		{
+			_logger.LogTrace("Initiating request. Method: {Method}; Url: {Url}; Content: {@Content}",
+				method.Method.ToUpperInvariant(), url, request);
+		}
 
 #pragma warning disable CA2000 // Dispose objects before losing scope
 		var requestMessage = new HttpRequestMessage
@@ -272,13 +275,19 @@ public sealed partial class StrikeClient
 			{
 				using var response = await Message.ConfigureAwait(false);
 
-				Logger.LogInformation("Completed request. Url: {Url}, Status Code: {StatusCode}.", Url,
-					response.StatusCode);
+				if (Logger.IsEnabled(LogLevel.Information))
+				{
+					Logger.LogInformation("Completed request. Url: {Url}, Status Code: {StatusCode}.", Url,
+						response.StatusCode);
+				}
 
 				var result = await BuildResponse<TResponse>(response).ConfigureAwait(false);
-				Logger.LogTrace("Completed request details. Url: {Url}; Response: {@Result}",
-					Url,
-					result);
+				if (Logger.IsEnabled(LogLevel.Trace))
+				{
+					Logger.LogTrace("Completed request details. Url: {Url}; Response: {@Result}",
+						Url,
+						result);
+				}
 				return result;
 			}
 			catch (Exception ex)

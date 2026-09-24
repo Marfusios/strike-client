@@ -1,6 +1,7 @@
 ﻿using Strike.Client.Models;
 
 namespace Strike.Client.PaymentQuotes.Onchain;
+
 public class OnchainTiersReq : RequestBase
 {
 	/// <summary>

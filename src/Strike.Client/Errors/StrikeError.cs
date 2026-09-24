@@ -8,7 +8,7 @@ public record StrikeError
 	/// <summary>
 	/// Unique identifier which represents this request in trace logs.
 	/// </summary>
-	public string? TraceId { get; init; } = null!;
+	public string? TraceId { get; init; }
 
 	/// <summary>
 	/// Error details

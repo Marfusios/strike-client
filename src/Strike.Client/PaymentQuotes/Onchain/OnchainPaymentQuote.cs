@@ -1,4 +1,5 @@
 ﻿namespace Strike.Client.PaymentQuotes.Onchain;
+
 public record OnchainPaymentQuote : PaymentQuote
 {
 	/// <summary>

@@ -1,4 +1,5 @@
 ﻿namespace Strike.Client.PaymentQuotes.Lightning;
+
 public record LnurlDetails : ResponseBase
 {
 	/// <summary>
