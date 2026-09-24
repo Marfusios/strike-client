@@ -11,7 +11,7 @@ public class OnchainPaymentQuoteReq : IdempotentRequestBase
 	public required string BtcAddress { get; init; }
 
 	/// <summary>
-	/// Currency to spend. If BTC is specified then `amount.currency` must also be BTC.
+	/// Currency to spend.
 	/// </summary>
 	/// <example>USD</example>
 	public required Currency SourceCurrency { get; init; }
@@ -32,4 +32,9 @@ public class OnchainPaymentQuoteReq : IdempotentRequestBase
 	/// </summary>
 	/// <example>tier_fast</example>
 	public required string OnchainTierId { get; init; }
+
+	/// <summary>
+	/// Beneficiary details when required for the payment.
+	/// </summary>
+	public PaymentQuoteBeneficiary? Beneficiary { get; init; }
 }

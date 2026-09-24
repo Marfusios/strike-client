@@ -14,7 +14,6 @@ public partial class LnPaymentQuoteReq : IdempotentRequestBase
 
 	/// <summary>
 	/// Currency to send from. Defaults to the user's default currency.
-	/// If BTC is specified then `amount.currency` must also be BTC.
 	/// </summary>
 	public Currency? SourceCurrency { get; set; }
 
@@ -22,5 +21,10 @@ public partial class LnPaymentQuoteReq : IdempotentRequestBase
 	/// Amount to send if using zero amount invoice. Must be omitted otherwise. FeePolicy defaults to EXCLUSIVE.
 	/// </summary>
 	public MoneyWithFee? Amount { get; set; }
+
+	/// <summary>
+	/// Beneficiary details when required for the payment.
+	/// </summary>
+	public PaymentQuoteBeneficiary? Beneficiary { get; set; }
 
 }

@@ -84,6 +84,7 @@ public sealed partial class StrikeClient
 #endif
 			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
 			PropertyNameCaseInsensitive = true,
+			PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
 		}
 			.AddStrikeConverters();
 
@@ -172,8 +173,8 @@ public sealed partial class StrikeClient
 		var url = new Uri(baseUrl, path);
 		if (_logger.IsEnabled(LogLevel.Trace))
 		{
-			_logger.LogTrace("Initiating request. Method: {Method}; Url: {Url}; Content: {@Content}",
-				method.Method.ToUpperInvariant(), url, request);
+			_logger.LogTrace("Initiating request. Method: {Method}; Url: {Url}",
+				method.Method.ToUpperInvariant(), url);
 		}
 
 #pragma warning disable CA2000 // Dispose objects before losing scope
@@ -237,8 +238,11 @@ public sealed partial class StrikeClient
 
 	private static string ConstructUrlParams(params (string Key, object? Value)[] parameters)
 	{
-		var nonEmptyParams = parameters.Where(p => p.Value != null);
-		var urlPart = string.Join("&", nonEmptyParams.Select(p => $"${p.Key}={ConstructUrlValue(p.Value)}"));
+		var nonEmptyParams = parameters.Where(p => p.Value != null)
+			.SelectMany(p => p.Value is System.Collections.IEnumerable values and not string
+				? values.Cast<object?>().Where(value => value != null).Select(value => (p.Key, Value: value))
+				: Enumerable.Repeat(p, 1));
+		var urlPart = string.Join("&", nonEmptyParams.Select(p => $"${p.Key}={Uri.EscapeDataString(ConstructUrlValue(p.Value))}"));
 		return urlPart.Length > 0 ? $"?{urlPart}" : string.Empty;
 	}
 
@@ -248,16 +252,9 @@ public sealed partial class StrikeClient
 			return string.Empty;
 		if (value is string str)
 			return str;
-		if (value is IEnumerable<object?> items)
-		{
-			return string.Join(",", items.Where(x => x != null));
-		}
-		if (value is IEnumerable<Guid> guids)
-		{
-			return string.Join(",", guids);
-		}
-
-		return value.ToString() ?? string.Empty;
+		return value is IFormattable formattable
+			? formattable.ToString(null, System.Globalization.CultureInfo.InvariantCulture)
+			: value.ToString() ?? string.Empty;
 	}
 
 	private readonly struct ResponseParser
@@ -351,7 +348,8 @@ public sealed partial class StrikeClient
 
 				if (ThrowOnError)
 					throw new StrikeApiException(
-						$"API error, status: {statusCode}, error: {error.Data.Code} {error.Data.Message}");
+						$"API error, status: {statusCode}, error: {error.Data.Code} {error.Data.Message}")
+					{ Error = error.Data };
 
 				var result = new TResponse { Error = error, StatusCode = response.StatusCode };
 
@@ -365,15 +363,16 @@ public sealed partial class StrikeClient
 		{
 			try
 			{
-				return JsonSerializer.Deserialize<StrikeError>(json, options: JsonSerializerOptions)!;
+				var error = JsonSerializer.Deserialize<StrikeError>(json, options: JsonSerializerOptions);
+				return error?.Data != null ? error : CreateFallbackError(statusCode, "The API returned an incomplete error response.");
 			}
 			catch (JsonException ex)
 			{
-				return new StrikeError
-				{
-					Data = new StrikeApiError { Status = statusCode, Code = "API_UNAVAILABLE", Message = ex.Message }
-				};
+				return CreateFallbackError(statusCode, ex.Message);
 			}
 		}
+
+		private static StrikeError CreateFallbackError(int statusCode, string message) =>
+			new() { Data = new StrikeApiError { Status = statusCode, Code = "API_UNAVAILABLE", Message = message } };
 	}
 }

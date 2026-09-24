@@ -22,7 +22,19 @@ public record Bolt11ReceiveRequest
 	/// This is a requested amount converted to BTC based on the current exchange rate. If the requested amount is already in BTC the values will be the same.
 	/// </summary>
 	/// <example>0.00017</example>
-	public decimal BtcAmount { get; init; }
+	/// <remarks>Returns zero when no amount was requested. Use <see cref="RequestedBtcAmount"/> to distinguish an absent amount.</remarks>
+	[JsonIgnore]
+	public decimal BtcAmount
+	{
+		get => RequestedBtcAmount.GetValueOrDefault();
+		init => RequestedBtcAmount = value;
+	}
+
+	/// <summary>
+	/// Requested amount converted to bitcoin, or null for a zero-amount invoice.
+	/// </summary>
+	[JsonPropertyName("btcAmount")]
+	public decimal? RequestedBtcAmount { get; init; }
 
 	/// <summary>
 	/// Invoice description.

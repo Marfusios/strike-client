@@ -34,5 +34,6 @@ public abstract class IdempotentRequestBase : RequestBase
 	/// In case of a duplicate request, the error code `DUPLICATE_XXX` containing data from the original response will be returned.
 	/// The key should be a random v4 UUID to avoid false collisions. 
 	/// </summary>
+	[JsonIgnore]
 	public Guid? IdempotencyKey { get; set; }
 }

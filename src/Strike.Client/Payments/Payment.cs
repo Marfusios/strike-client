@@ -20,6 +20,16 @@ public record Payment : ResponseBase
 	public PaymentState State { get; init; }
 
 	/// <summary>
+	/// Legacy execution result. Strike recommends using State.
+	/// </summary>
+	public PaymentResult Result { get; init; }
+
+	/// <summary>
+	/// Legacy completion timestamp. Strike recommends using Completed.
+	/// </summary>
+	public DateTimeOffset? Delivered { get; init; }
+
+	/// <summary>
 	/// The timestamp of the payment completion
 	/// </summary>
 	public DateTimeOffset? Completed { get; init; }
@@ -53,4 +63,25 @@ public record Payment : ResponseBase
 	/// The reward that the sender might receive, if applicable
 	/// </summary>
 	public Money? Reward { get; init; }
+
+	/// <summary>
+	/// Details of a Lightning Network payment, when applicable.
+	/// </summary>
+	public LightningData? Lightning { get; init; }
+
+	/// <summary>
+	/// Details of an onchain payment, when applicable.
+	/// </summary>
+	public OnchainData? Onchain { get; init; }
+
+	public record LightningData
+	{
+		public Money? NetworkFee { get; init; }
+		public string? PreImage { get; init; }
+	}
+
+	public record OnchainData
+	{
+		public string? TxnId { get; init; }
+	}
 }

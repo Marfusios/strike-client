@@ -34,9 +34,22 @@ public record DepositFeeEstimate : ResponseBase
 	/// <summary>
 	/// Timestamp at which the settlement will happen. At this time, the funds become available to be spent or sent out of the system (see balance endpoint for more information). If null, the settlement is immediate
 	/// </summary>
-	public DateTimeOffset SettledAt { get; init; }
+	/// <remarks>Returns the default timestamp for immediate settlement. Use <see cref="SettlementTime"/> to distinguish it.</remarks>
+	[JsonIgnore]
+	public DateTimeOffset SettledAt
+	{
+		get => SettlementTime.GetValueOrDefault();
+		init => SettlementTime = value;
+	}
 
 	/// <summary>
-	/// Settlement period in days. After the said period, the funds become available to be spent or sent out of the system (see balance endpoint for more information). If null, the settlement is immediate	/// </summary>
+	/// Settlement timestamp, or null when the funds settle immediately.
+	/// </summary>
+	[JsonPropertyName("settledAt")]
+	public DateTimeOffset? SettlementTime { get; init; }
+
+	/// <summary>
+	/// Settlement period in days. Deprecated by Strike in favor of the settlement timestamp. If null, settlement is immediate.
+	/// </summary>
 	public int? SettlementPeriodInDay { get; init; }
 }

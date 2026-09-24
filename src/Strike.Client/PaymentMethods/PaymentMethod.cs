@@ -52,7 +52,24 @@ public record PaymentMethod : ResponseBase
 	/// <summary>
 	/// Account Type
 	/// </summary>
-	public PaymentMethodAccountTypes AccountType { get; init; }
+	/// <remarks>Returns Checking when no account type is provided. Use <see cref="OptionalAccountType"/> to distinguish an absent value.</remarks>
+	[JsonIgnore]
+	public PaymentMethodAccountTypes AccountType
+	{
+		get => OptionalAccountType.GetValueOrDefault();
+		init => OptionalAccountType = value;
+	}
+
+	/// <summary>
+	/// Bank account type, when supplied by Strike.
+	/// </summary>
+	[JsonPropertyName("accountType")]
+	public PaymentMethodAccountTypes? OptionalAccountType { get; init; }
+
+	/// <summary>
+	/// Currency of the bank account.
+	/// </summary>
+	public Currency Currency { get; init; }
 
 	/// <summary>
 	/// Bank Name

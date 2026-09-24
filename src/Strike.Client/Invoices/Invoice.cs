@@ -43,4 +43,9 @@ public record Invoice : ResponseBase
 	/// </summary>
 	/// <example>14011616-a18f-47a0-bfef-0687626bec35</example>
 	public Guid? PayerId { get; init; }
+
+	/// <summary>
+	/// Transactions returned when the invoice is fetched with includeTransactions enabled.
+	/// </summary>
+	public IReadOnlyCollection<InvoiceTransaction>? Transactions { get; init; }
 }

@@ -14,6 +14,11 @@ public sealed partial class StrikeClient
 	/// </summary>
 	public record AccountsClient(StrikeClient Client)
 	{
+		/// <summary>Fetch the authenticated account's transaction limits.</summary>
+		public Task<AccountLimits> GetLimits() =>
+			Client.Get("/v1/accounts/limits")
+				.ParseResponse<AccountLimits>();
+
 		/// <summary>
 		/// Fetch public account profile of authenticated user
 		/// </summary>
@@ -32,7 +37,7 @@ public sealed partial class StrikeClient
 		/// Fetch public account profile info by handle
 		/// </summary>
 		public Task<AccountProfile> GetProfile(string handle) =>
-			Client.Get($"/v1/accounts/handle/{handle}/profile")
+			Client.Get($"/v1/accounts/handle/{Uri.EscapeDataString(handle)}/profile")
 				.ParseResponse<AccountProfile>();
 	}
 }

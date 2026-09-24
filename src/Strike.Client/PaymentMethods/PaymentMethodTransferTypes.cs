@@ -33,5 +33,11 @@ public enum PaymentMethodTransferTypes
 	/// <para>Catch-all for unknown values returned by Strike. If you encounter this, please check if there is a later version of the Strike.Client library.</para>
 	/// </summary>
 	[EnumMember(Value = "UNDEFINED")]
-	Undefined
+	Undefined,
+
+	/// <summary>
+	/// Australian bank transfer using a BSB code.
+	/// </summary>
+	[EnumMember(Value = "BSB")]
+	BSB
 }

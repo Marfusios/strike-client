@@ -14,4 +14,7 @@ public record StrikeError
 	/// Error details
 	/// </summary>
 	public StrikeApiError Data { get; init; } = null!;
+
+	/// <summary>Additional diagnostics returned by the development environment.</summary>
+	public StrikeErrorDebug? Debug { get; init; }
 }

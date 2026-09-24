@@ -38,7 +38,7 @@ public sealed partial class StrikeClient
 		/// Get LNURL details
 		/// </summary>
 		public Task<LnurlDetails> GetLnurlDetails(string lnAddressOrUrl) =>
-			Client.Get($"/v1/payment-quotes/lightning/lnurl/{lnAddressOrUrl}")
+			Client.Get($"/v1/payment-quotes/lightning/lnurl/{Uri.EscapeDataString(lnAddressOrUrl)}")
 				.ParseResponse<LnurlDetails>();
 
 		/// <summary>

@@ -8,6 +8,7 @@ public record Beneficiary
 	/// <summary>
 	/// Date of birth
 	/// </summary>
+	[JsonConverter(typeof(Converters.DateOnlyDateTimeOffsetConverter))]
 	public DateTimeOffset? DateOfBirth { get; init; }
 
 	/// <summary>

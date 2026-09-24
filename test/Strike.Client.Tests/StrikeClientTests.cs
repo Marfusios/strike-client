@@ -3,15 +3,55 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Strike.Client.Deposits;
 using Strike.Client.Errors;
 using Strike.Client.Invoices;
 using Strike.Client.Models;
+using Strike.Client.Subscriptions;
 
 namespace Strike.Client.Tests;
 
 public class StrikeClientTests
 {
+	[Fact]
+	public async Task ReceiveFilters_SendRepeatedEscapedKeysAndOmitEmptyArrays()
+	{
+		var id1 = Guid.NewGuid();
+		var id2 = Guid.NewGuid();
+		using var handler = new StubHandler(request =>
+		{
+			Assert.Equal($"?$top=100&$skip=0&$paymentHash=first%26value&$paymentHash=second%2Bvalue&$receiveId={id1}&$receiveId={id2}", request.RequestUri?.Query);
+			return JsonResponse("{}");
+		});
+		using var http = new HttpClient(handler);
+		var client = CreateClient(http);
+		client.ThrowOnError = true;
+
+		_ = await client.ReceiveRequests.GetReceives(paymentHash: ["first&value", null, "second+value"], receiveId: [id1, id2], onchainAddress: []);
+	}
+
+	[Fact]
+	public async Task SubscriptionSecret_IsSentButNotLogged()
+	{
+		const string Secret = "offline-webhook-signing-secret";
+		using var handler = new StubHandler(async request =>
+		{
+			using var body = JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
+			Assert.Equal(Secret, body.RootElement.GetProperty("secret").GetString());
+			return JsonResponse("{}");
+		});
+		using var http = new HttpClient(handler);
+		var logger = new CapturingLogger();
+		var client = new StrikeClient(StrikeEnvironment.Live, "offline", new StubClientFactory(http), logger);
+
+		var result = await client.Subscriptions.UpdateSubscription(Guid.NewGuid(), new SubscriptionUpdateReq { Secret = Secret });
+
+		Assert.True(result.IsSuccessStatusCode);
+		Assert.DoesNotContain(logger.Values, value => value is RequestBase);
+		Assert.DoesNotContain(logger.Messages, message => message.Contains(Secret, StringComparison.Ordinal));
+	}
+
 	[Fact]
 	public async Task GetBalances_ParsesResponseAndSendsHeaders()
 	{
@@ -53,12 +93,12 @@ public class StrikeClientTests
 			Assert.Equal("/v1/invoices", request.RequestUri?.AbsolutePath);
 			Assert.Equal("application/json", request.Content?.Headers.ContentType?.MediaType);
 			using var body = JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
-			var amount = body.RootElement.GetProperty("Amount");
-			Assert.Equal("12.34", amount.GetProperty("Amount").GetString());
-			Assert.Equal("USD", amount.GetProperty("Currency").GetString());
+			var amount = body.RootElement.GetProperty("amount");
+			Assert.Equal("12.34", amount.GetProperty("amount").GetString());
+			Assert.Equal("USD", amount.GetProperty("currency").GetString());
 			Assert.False(body.RootElement.TryGetProperty("ShowRawJson", out _));
 			Assert.False(body.RootElement.TryGetProperty("AdditionalHeaders", out _));
-			Assert.False(body.RootElement.TryGetProperty("Description", out _));
+			Assert.False(body.RootElement.TryGetProperty("description", out _));
 			return JsonResponse("{}");
 		});
 		using var httpClient = new HttpClient(handler);
@@ -79,12 +119,15 @@ public class StrikeClientTests
 	public async Task CreateDeposit_SendsIdempotencyAndRequestHeaders()
 	{
 		var idempotencyKey = Guid.NewGuid();
-		using var handler = new StubHandler(request =>
+		using var handler = new StubHandler(async request =>
 		{
 			Assert.Equal(HttpMethod.Post, request.Method);
 			Assert.Equal("/v1/deposits", request.RequestUri?.AbsolutePath);
 			Assert.Equal(idempotencyKey.ToString(), Assert.Single(request.Headers.GetValues("idempotency-key")));
 			Assert.Equal("request-value", Assert.Single(request.Headers.GetValues("X-Request")));
+			using var body = JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
+			Assert.False(body.RootElement.TryGetProperty("idempotencyKey", out _));
+			Assert.False(body.RootElement.TryGetProperty("IdempotencyKey", out _));
 			return JsonResponse("{}");
 		});
 		using var httpClient = new HttpClient(handler);
@@ -167,11 +210,16 @@ public class StrikeClientTests
 		var error = await Assert.ThrowsAsync<StrikeApiException>(client.Balances.GetBalances);
 
 		Assert.Contains("UNAUTHORIZED", error.Message, StringComparison.Ordinal);
+		Assert.Equal("UNAUTHORIZED", error.Error?.Code);
+		Assert.Equal(401, error.Error?.Status);
 	}
 
 	[Theory]
 	[InlineData("<html>Unavailable</html>", HttpStatusCode.BadGateway)]
 	[InlineData("", HttpStatusCode.TooManyRequests)]
+	[InlineData("null", HttpStatusCode.Unauthorized)]
+	[InlineData("{}", HttpStatusCode.Forbidden)]
+	[InlineData("{\"data\":null}", HttpStatusCode.BadRequest)]
 	public async Task NonJsonError_PreservesHttpStatus(string body, HttpStatusCode status)
 	{
 		using var handler = new StubHandler(_ => JsonResponse(body, status));
@@ -181,6 +229,21 @@ public class StrikeClientTests
 
 		Assert.Equal(status, response.StatusCode);
 		Assert.Equal("API_UNAVAILABLE", response.Error?.Data.Code);
+	}
+
+	[Theory]
+	[InlineData("null")]
+	[InlineData("{}")]
+	public async Task IncompleteError_ThrowsApiExceptionWithOriginalStatus(string body)
+	{
+		using var handler = new StubHandler(_ => JsonResponse(body, HttpStatusCode.TooManyRequests));
+		using var httpClient = new HttpClient(handler);
+		var client = CreateClient(httpClient);
+		client.ThrowOnError = true;
+
+		var error = await Assert.ThrowsAsync<StrikeApiException>(client.Balances.GetBalances);
+
+		Assert.Equal(429, error.Error?.Status);
 	}
 
 	[Theory]
@@ -243,6 +306,22 @@ public class StrikeClientTests
 		{
 			Assert.Equal(StrikeOptions.HttpClientName, name);
 			return client;
+		}
+	}
+
+	private sealed class CapturingLogger : ILogger<StrikeClient>
+	{
+		public List<object?> Values { get; } = [];
+		public List<string> Messages { get; } = [];
+
+		public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+		public bool IsEnabled(LogLevel logLevel) => true;
+
+		public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+		{
+			Messages.Add(formatter(state, exception));
+			if (state is IEnumerable<KeyValuePair<string, object?>> values)
+				Values.AddRange(values.Select(value => value.Value));
 		}
 	}
 

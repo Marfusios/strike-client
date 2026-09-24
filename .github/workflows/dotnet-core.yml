@@ -14,9 +14,24 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.release-notes.outputs.version }}
 
     steps:
     - uses: actions/checkout@v7
+    - name: Validate release notes
+      id: release-notes
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = 'Stop'
+        [xml]$props = Get-Content Directory.Build.props
+        $version = $props.SelectSingleNode('/Project/PropertyGroup/Version').InnerText.Trim()
+        if ($version -notmatch '^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$') { throw "Invalid package version: $version" }
+        $notes = "docs/releases/$version.md"
+        if (!(Test-Path -LiteralPath $notes) -or [string]::IsNullOrWhiteSpace((Get-Content -LiteralPath $notes -Raw))) {
+          throw "Write release notes in $notes before publishing."
+        }
+        "version=$version" >> $env:GITHUB_OUTPUT
     - name: Setup .NET
       uses: actions/setup-dotnet@v6
       with:
@@ -31,7 +46,7 @@ jobs:
     - name: Unit tests
       run: dotnet test test/Strike.Client.Tests/Strike.Client.Tests.csproj --configuration Release --no-build --logger "trx;LogFilePrefix=tests"
     - name: Read-only integration tests
-      run: dotnet test test_integration/Strike.Client.IntegrationTests/Strike.Client.IntegrationTests.csproj --configuration Release --no-build --filter "FullyQualifiedName~GetBalances_ShouldWork|FullyQualifiedName~GetRates_ShouldWork|FullyQualifiedName~InvalidUrl_ShouldNotThrowException" --logger "trx;LogFilePrefix=tests"
+      run: dotnet test test_integration/Strike.Client.IntegrationTests/Strike.Client.IntegrationTests.csproj --configuration Release --no-build --filter "FullyQualifiedName~GetBalances_ShouldWork|FullyQualifiedName~GetRates_ShouldWork|FullyQualifiedName~ApiReadOnlyTests" --logger "trx;LogFilePrefix=tests"
       env:
           Strike__ApiKey: ${{secrets.STRIKE_API_KEY}}
           Strike__Environment: Live
@@ -52,5 +67,59 @@ jobs:
         user: marfusios
     - name: Publish library (NuGet)
       run: dotnet nuget push *.nupkg --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --source "https://api.nuget.org/v3/index.json" --skip-duplicate
-    #- name: Publish library (Github)
-    #  run: dotnet nuget push *.nupkg --api-key ${{secrets.PUBLISH_TO_GITHUB_TOKEN}} --source "https://nuget.pkg.github.com/marfusios/index.json" --skip-duplicate
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v7
+    - name: Publish GitHub release notes
+      shell: pwsh
+      env:
+        GH_TOKEN: ${{ github.token }}
+        PACKAGE_VERSION: ${{ needs.build.outputs.version }}
+      run: |
+        $ErrorActionPreference = 'Stop'
+        $tag = "v$env:PACKAGE_VERSION"
+        gh release view $tag --json tagName --jq .tagName 2>$null
+        if ($LASTEXITCODE -ne 0) {
+          # NuGet processes uploads asynchronously. Verify the public package's
+          # commit before tagging, including recovery after a duplicate upload.
+          $packagePath = Join-Path $env:RUNNER_TEMP "strike-$env:PACKAGE_VERSION.nupkg"
+          $packageUrl = "https://api.nuget.org/v3-flatcontainer/strikewallet.client/$env:PACKAGE_VERSION/strikewallet.client.$env:PACKAGE_VERSION.nupkg"
+          $downloaded = $false
+          for ($attempt = 1; $attempt -le 60; $attempt++) {
+            try {
+              Invoke-WebRequest -Uri $packageUrl -OutFile $packagePath
+              $downloaded = $true
+              break
+            } catch {
+              if ($attempt -eq 60) { throw }
+              Write-Host "Waiting for NuGet package availability ($attempt/60)."
+              Start-Sleep -Seconds 15
+            }
+          }
+          if (!$downloaded) { throw "Published NuGet package is unavailable." }
+          $archive = [System.IO.Compression.ZipFile]::OpenRead($packagePath)
+          try {
+            $entry = $archive.GetEntry('StrikeWallet.Client.nuspec')
+            $reader = [System.IO.StreamReader]::new($entry.Open())
+            try { [xml]$nuspec = $reader.ReadToEnd() } finally { $reader.Dispose() }
+          } finally { $archive.Dispose() }
+          $packageCommit = $nuspec.SelectSingleNode('/*[local-name()="package"]/*[local-name()="metadata"]/*[local-name()="repository"]/@commit').Value
+          if ($packageCommit -ne $env:GITHUB_SHA) {
+            throw "NuGet version $env:PACKAGE_VERSION belongs to commit $packageCommit, not $env:GITHUB_SHA. Bump the version or rerun the original commit's release job."
+          }
+          $tagRefs = @(git ls-remote --tags origin "refs/tags/$tag" "refs/tags/$tag^{}")
+          if ($LASTEXITCODE -ne 0) { throw "Unable to verify the release tag." }
+          $tagRef = $tagRefs | Where-Object { $_.EndsWith('^{}') } | Select-Object -First 1
+          if (!$tagRef) { $tagRef = $tagRefs | Select-Object -First 1 }
+          if ($tagRef -and (($tagRef -split '\s+')[0] -ne $packageCommit)) {
+            throw "Existing tag $tag does not match the published NuGet package's commit."
+          }
+          gh release create $tag --target $env:GITHUB_SHA --title "StrikeWallet.Client $env:PACKAGE_VERSION" --notes-file "docs/releases/$env:PACKAGE_VERSION.md"
+          if ($LASTEXITCODE -ne 0) { throw "GitHub release publication failed." }
+        }

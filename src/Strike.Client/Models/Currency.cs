@@ -39,5 +39,9 @@ public enum Currency
 	/// <para>Catch-all for unknown values returned by Strike. If you encounter this, please check if there is a later version of the Strike.Client library.</para>
 	/// </summary>
 	[EnumMember(Value = "UNDEFINED")]
-	Undefined
+	Undefined,
+
+	/// <summary>Australian dollar</summary>
+	[EnumMember(Value = "AUD")]
+	Aud
 }

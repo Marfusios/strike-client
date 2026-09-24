@@ -19,12 +19,23 @@ public class PaymentMethodReq : RequestBase
 	/// <summary>
 	/// Routing Number
 	/// </summary>
-	public required string RoutingNumber { get; init; }
+	public string? RoutingNumber { get; init; }
 
 	/// <summary>
 	/// Account Type
 	/// </summary>
-	public PaymentMethodAccountTypes AccountType { get; init; }
+	[JsonIgnore]
+	public PaymentMethodAccountTypes AccountType
+	{
+		get => OptionalAccountType.GetValueOrDefault();
+		init => OptionalAccountType = value;
+	}
+
+	/// <summary>
+	/// Account type. Required for ACH; may be omitted for other transfer types.
+	/// </summary>
+	[JsonPropertyName("accountType")]
+	public PaymentMethodAccountTypes? OptionalAccountType { get; init; }
 
 	/// <summary>
 	/// Bank Name

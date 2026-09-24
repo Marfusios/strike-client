@@ -19,5 +19,16 @@ public class DepositReq : IdempotentRequestBase
 	/// <summary>
 	/// Should the fee be included in the amount or added on top of it. Defaults to EXCLUSIVE.
 	/// </summary>
-	public FeePolicy? Fee { get; init; }
+	[JsonIgnore]
+	public FeePolicy? Fee
+	{
+		get => FeePolicy;
+		init => FeePolicy = value;
+	}
+
+	/// <summary>
+	/// Whether the fee is included in the amount or added on top. Defaults to EXCLUSIVE.
+	/// </summary>
+	[JsonPropertyName("feePolicy")]
+	public FeePolicy? FeePolicy { get; init; }
 }

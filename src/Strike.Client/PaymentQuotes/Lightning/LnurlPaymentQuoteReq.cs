@@ -13,7 +13,7 @@ public partial class LnurlPaymentQuoteReq : IdempotentRequestBase
 	public required string LnAddressOrUrl { get; set; }
 
 	/// <summary>
-	/// <para>Currency to spend. If BTC is specified then <c>amount.currency</c> must also be BTC</para>
+	/// <para>Currency to spend.</para>
 	/// </summary>
 	public required Currency SourceCurrency { get; set; }
 

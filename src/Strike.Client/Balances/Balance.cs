@@ -16,6 +16,21 @@ public sealed record Balance : ResponseBase
 	public Currency Currency { get; init; }
 
 	/// <summary>
+	/// Balance available for currency conversion, including unspent pending deposits.
+	/// </summary>
+	public decimal Current { get; init; }
+
+	/// <summary>
+	/// Deposits awaiting settlement, denominated in this currency.
+	/// </summary>
+	public decimal Pending { get; init; }
+
+	/// <summary>
+	/// Balance reserved for withdrawals, orders, and other pending spending.
+	/// </summary>
+	public decimal Reserved { get; init; }
+
+	/// <summary>
 	/// The balance currently being withdrawn
 	/// </summary>
 	/// <example>50.00</example>
